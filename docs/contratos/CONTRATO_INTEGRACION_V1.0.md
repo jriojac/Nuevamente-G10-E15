@@ -1,4 +1,3 @@
-[CONTRATO_INTEGRACION_V1.0.md](https://github.com/user-attachments/files/32672345/CONTRATO_INTEGRACION_V1.0.md)
 # CONTRATO_INTEGRACION_V1.0.md
 
 ## TechMind / NuevaMente --- Contrato de Integración FE ↔ BE ↔ Data/DS
@@ -278,31 +277,159 @@ REJECTED
 # 7. Fuentes y trazabilidad
 
 El resultado debe permitir identificar de dónde proviene la información
-utilizada.
+utilizada para generar el contenido.
 
-## 7.1 Información esperada
+La trazabilidad debe ser suficiente para que Backend y Frontend puedan
+identificar y, cuando corresponda, mostrar al usuario la fuente de origen,
+sin exponer detalles internos de la implementación de Data/IA.
 
-Como mínimo:
+## 7.1 Esquema propuesto de `sources`
 
-``` json
+Se propone inicialmente la siguiente estructura:
+
+```json
 {
   "source_id": "src_001",
   "document_id": "doc_456",
+  "reference": "manual.pdf - Introducción - página 12",
   "page": 12,
-  "section": "Introducción",
-  "reference": "..."
+  "section": "Introducción"
 }
 ```
 
-### Pendiente
+### 7.1.1 Clasificación inicial de campos
 
-Definir el esquema definitivo de `sources`:
+| Campo | Estado propuesto | Descripción |
+|---|---|---|
+| `source_id` | **OBLIGATORIO** | Identificador de la fuente dentro de la respuesta |
+| `document_id` | **OBLIGATORIO** | Identificador del documento de origen |
+| `reference` | **OBLIGATORIO** | Referencia legible que permita identificar el origen de la información |
+| `page` | **OPCIONAL** | Número de página, cuando el tipo de documento disponga de esta información |
+| `section` | **OPCIONAL** | Sección o apartado de origen, cuando pueda identificarse |
 
--   campos obligatorios;
--   campos opcionales;
--   formato de referencia;
--   si `page` aplica a todos los tipos de documento;
--   qué información es interna y cuál será expuesta al FE.
+### 7.1.2 Ejemplo con información completa
+
+Para un documento con páginas y secciones:
+
+```json
+{
+  "source_id": "src_001",
+  "document_id": "doc_456",
+  "reference": "manual.pdf - Introducción - página 12",
+  "page": 12,
+  "section": "Introducción"
+}
+```
+
+### 7.1.3 Ejemplo sin número de página
+
+Para un documento que no maneje páginas, por ejemplo Markdown:
+
+```json
+{
+  "source_id": "src_002",
+  "document_id": "doc_789",
+  "reference": "README.md - Instalación",
+  "section": "Instalación"
+}
+```
+
+En este caso `page` no debe ser obligatorio ni debe generarse
+artificialmente para cumplir el contrato.
+
+### 7.1.4 Información interna de Data/IA
+
+Data puede utilizar información adicional para la trazabilidad interna
+del proceso RAG, por ejemplo:
+
+```json
+{
+  "source_id": "src_001",
+  "document_id": "doc_456",
+  "chunk_id": "chunk_045",
+  "page": 12,
+  "section": "Introducción",
+  "similarity": 0.91,
+  "retrieval_rank": 1
+}
+```
+
+Los siguientes campos se consideran inicialmente **internos de Data/IA**
+y no forman parte del contrato público con Frontend:
+
+- `chunk_id`
+- `similarity`
+- `retrieval_rank`
+- identificadores internos de embeddings;
+- identificadores del vector store;
+- cualquier otro dato técnico utilizado por el proceso de retrieval.
+
+Esto permite que Data pueda modificar su implementación interna sin
+romper el contrato con Backend o Frontend.
+
+## 7.2 Propuesta de exposición hacia Frontend
+
+Frontend debería recibir únicamente la información necesaria para
+presentar la trazabilidad al usuario.
+
+Como propuesta inicial:
+
+```json
+{
+  "sources": [
+    {
+      "source_id": "src_001",
+      "document_id": "doc_456",
+      "reference": "manual.pdf - Introducción - página 12",
+      "page": 12,
+      "section": "Introducción"
+    }
+  ]
+}
+```
+
+La información técnica utilizada internamente por Data para el retrieval
+no debe ser una dependencia de Frontend.
+
+## 7.3 PREGUNTA PENDIENTE PARA BE + FE
+
+> **¿Qué información necesita realmente Frontend para presentar la
+> trazabilidad al usuario?**
+
+Esta decisión debe validarse antes de cerrar el esquema definitivo de
+`sources`.
+
+En particular, BE + FE deben confirmar:
+
+- si `source_id` debe ser visible para Frontend;
+- si `document_id` debe ser visible para Frontend;
+- qué formato debe tener `reference`;
+- si `page` debe mostrarse al usuario cuando exista;
+- si `section` debe mostrarse al usuario cuando exista;
+- si Frontend necesita algún dato adicional para permitir al usuario
+  identificar o consultar la fuente.
+
+### Propuesta inicial para revisión
+
+**Obligatorios:**
+
+- `source_id`
+- `document_id`
+- `reference`
+
+**Opcionales:**
+
+- `page`
+- `section`
+
+**Internos de Data/IA y no expuestos a FE:**
+
+- `chunk_id`
+- `similarity`
+- `retrieval_rank`
+- identificadores internos de embeddings/vector store
+
+> **Estado: PROPUESTA — PENDIENTE DE VALIDACIÓN CON BE + FE.**
 
 ------------------------------------------------------------------------
 
