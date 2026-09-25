@@ -1,158 +1,105 @@
-# CONTRATO_INTEGRACION_V1.0.md
+# REVISIÓN DE PENDIENTES — CONTRATO DE INTEGRACIÓN V1.0
 
-## TechMind / NuevaMente --- Contrato de Integración FE ↔ BE ↔ Data/DS
+## TechMind / NuevaMente
 
-**Proyecto:** TechMind / NuevaMente\
-**Equipo:** G10-LATAM-EQUIPO15\
-**Versión:** 1.0\
-**Fecha:** 2026-09-25\
-**Estado:** Propuesta consolidada para alineación del equipo\
-**Documento:** Contrato de integración
+**Proyecto:** TechMind / NuevaMente  
+**Equipo:** G10-LATAM-EQUIPO15  
+**Documento relacionado:** `CONTRATO_INTEGRACION_V1.0.md`  
+**Estado:** Documento de trabajo para alineación BE + Data + FE  
+**Objetivo:** Convertir los puntos pendientes del contrato en propuestas concretas y preguntas de decisión.
 
-------------------------------------------------------------------------
+---
 
-## 1. Objetivo
+# 1. Objetivo de esta revisión
 
-Este documento define los contratos de integración entre:
+El contrato `CONTRATO_INTEGRACION_V1.0.md` ya establece una base común para la integración:
 
--   **Frontend (FE) ↔ Backend (BE)**
--   **Backend (BE) ↔ Data Science / IA (DS)**
-
-El objetivo es que FE, BE y Data puedan desarrollar de forma
-desacoplada, utilizando estructuras, responsabilidades, entradas,
-salidas, errores y reglas claramente identificadas.
-
-> **Regla principal:** lo que aparece como **ACORDADO** forma parte del
-> contrato. Lo que aparece como **PENDIENTE DE DEFINICIÓN** no debe ser
-> asumido por ningún equipo.
-
-------------------------------------------------------------------------
-
-# 2. Alcance funcional del MVP
-
-## 2.1 Perfiles
-
-El MVP contempla tres perfiles:
-
--   `JUNIOR`
--   `SENIOR`
--   `EJECUTIVO`
-
-El perfil será un parámetro de adaptación. No implica crear un agente
-independiente por perfil.
-
-## 2.2 Formatos
-
-El MVP contempla cuatro formatos:
-
--   `FLASHCARD`
--   `QUIZ`
--   `EXECUTIVE_SUMMARY`
--   `MIND_MAP`
-
-### Fuera del MVP
-
-`STEP_BY_STEP` / `GUIA_PASO_A_PASO` queda como funcionalidad futura y no
-debe considerarse obligatoria para la primera versión.
-
-------------------------------------------------------------------------
-
-# 3. Principio de arquitectura
-
-``` mermaid
-flowchart LR
-    FE[Frontend]
-    BE[Backend]
-    DS[Data Science / IA]
-    RAG[RAG + Knowledge Core]
-    OCI[OCI Storage]
-
-    FE -->|API pública| BE
-    BE -->|Contrato interno| DS
-    DS --> RAG
-    RAG --> DS
-    DS -->|Resultado estructurado| BE
-    BE --> OCI
-    BE -->|Respuesta estable| FE
+```text
+Frontend
+   ↓
+Backend
+   ↓
+Data / IA
+   ↓
+RAG + Knowledge Core + Adaptación
 ```
 
-## 3.1 Responsabilidad de cada capa
+Sin embargo, la sección **23. DECISIONES PENDIENTES** contiene varios puntos que deben cerrarse antes de considerar el contrato V1.0 como definitivo.
 
-  -----------------------------------------------------------------------
-  Capa                                Responsabilidad
-  ----------------------------------- -----------------------------------
-  FE                                  Interfaz, captura de parámetros,
-                                      presentación de resultados y
-                                      estados
+Esta revisión aplica un criterio común:
 
-  BE                                  API pública, validación, seguridad,
-                                      IDs, orquestación, persistencia y
-                                      exposición del contrato a FE
-
-  Data/DS                             RAG, Knowledge Core, adaptación por
-                                      perfil/formato, fuentes y
-                                      validación IA
-
-  OCI                                 Persistencia gestionada por
-                                      Backend/infraestructura
-  -----------------------------------------------------------------------
-
-------------------------------------------------------------------------
-
-# 4. CONTRATO BE ↔ DATA SCIENCE
-
-## 4.1 Propósito
-
-El contrato BE ↔ DS define cómo Backend solicita a Data una adaptación
-educativa y cómo Data devuelve el resultado estructurado, validado y
-trazable.
-
-Data no debe exponer a Backend la implementación interna de:
-
--   embeddings;
--   vector store;
--   estrategia RAG;
--   prompts;
--   modelo utilizado;
--   framework de orquestación;
--   configuración interna del pipeline.
-
-Backend debe consumir el contrato, no depender de la implementación.
-
-------------------------------------------------------------------------
-
-## 4.2 Flujo
-
-``` mermaid
-sequenceDiagram
-    participant BE as Backend
-    participant DS as Data / IA
-
-    BE->>DS: Solicitud de adaptación
-    DS->>DS: Retrieval / RAG
-    DS->>DS: Knowledge Core
-    DS->>DS: Adaptación por perfil y formato
-    DS->>DS: Validación IA
-    DS-->>BE: Resultado estructurado
-    BE->>BE: Validación del contrato
+```text
+Estado actual
+      ↓
+Propuesta
+      ↓
+Ejemplo
+      ↓
+Pregunta concreta
+      ↓
+Responsable de decisión
+      ↓
+Actualizar contrato
 ```
 
-------------------------------------------------------------------------
+> **Regla:** una propuesta no se considera acordada hasta que BE, Data y/o FE validen el punto que corresponda.
 
-## 4.3 Solicitud BE → DS
+---
 
-La solicitud interna deberá contener, como mínimo, la información
-necesaria para identificar el documento y ejecutar la adaptación.
+# 2. Estado general
 
-### Estructura conceptual
+## 2.1 Bloqueantes para la integración
 
-``` json
+Estos puntos deben resolverse antes de que los equipos implementen contra contratos diferentes:
+
+1. JSON Schema.
+2. Campos obligatorios y opcionales.
+3. Entrada y normalización del documento.
+4. Reglas de perfiles.
+5. Reglas de formatos.
+6. Respuesta Data → Backend.
+7. Fuentes y trazabilidad.
+8. Estados.
+9. Errores.
+10. Límites básicos.
+
+## 2.2 Necesarios para cerrar V1
+
+11. Versionamiento.
+12. Parámetros y reglas de RAG.
+13. Validación IA.
+14. Retries.
+15. Timeout.
+16. Idempotencia.
+17. Persistencia OCI.
+
+## 2.3 Pueden quedar para una decisión posterior / MVP según necesidad
+
+18. Streaming.
+19. Cancelación.
+20. Documentos por referencia.
+21. Política avanzada de retención.
+22. Compatibilidad entre múltiples versiones.
+
+---
+
+# 3. 23.1 Contrato
+
+## 3.1 JSON Schema formal
+
+**Estado:** 🔴 PENDIENTE
+
+Actualmente existen estructuras JSON conceptuales, pero todavía no un JSON Schema formal.
+
+Ejemplo actual:
+
+```json
 {
   "request_id": "req_123",
   "document_id": "doc_456",
   "document": {
-    "title": "Título del documento",
-    "text": "Texto normalizado del documento",
+    "title": "Título",
+    "text": "Texto",
     "source": "origen"
   },
   "profile": "JUNIOR",
@@ -160,514 +107,785 @@ necesaria para identificar el documento y ejecutar la adaptación.
 }
 ```
 
-### Campos actualmente acordados
+### Debe definirse formalmente
 
-  ---------------------------------------------------------------------------
-  Campo               Tipo              Estado            Descripción
-  ------------------- ----------------- ----------------- -------------------
-  `request_id`        string            ACORDADO          Identificador de la
-                                                          solicitud
+- `type`
+- `required`
+- `enum`
+- `nullable`
+- `minLength`
+- `maxLength`
+- cardinalidad de arrays
+- estructura de objetos
+- restricciones de contenido
 
-  `document_id`       string            ACORDADO          Identificador del
-                                                          documento
+### Propuesta
 
-  `document.title`    string            ACORDADO          Título
+Cerrar primero las decisiones funcionales y después generar:
 
-  `document.text`     string            ACORDADO          Texto normalizado
+```text
+Decisiones funcionales
+        ↓
+JSON Schema
+        ↓
+OpenAPI
+        ↓
+BE / FE / Data
+```
 
-  `document.source`   string            ACORDADO          Origen o referencia
+### Pregunta pendiente
 
-  `profile`           enum              ACORDADO          JUNIOR / SENIOR /
-                                                          EJECUTIVO
+> **¿Qué campos y restricciones debemos considerar definitivos antes de generar el JSON Schema?**
 
-  `format`            enum              ACORDADO          FLASHCARD / QUIZ /
-                                                          EXECUTIVE_SUMMARY /
-                                                          MIND_MAP
-  ---------------------------------------------------------------------------
+**Responsables:** BE + Data + FE.
 
-------------------------------------------------------------------------
+---
 
-## 4.4 Parámetros propuestos pero pendientes
+## 3.2 Campos obligatorios / opcionales
 
-Las propuestas anteriores contemplan parámetros adicionales:
+**Estado:** 🟡 EN AVANCE
 
-``` text
+El punto 7 (`sources`) ya tiene una propuesta concreta.
+
+### Propuesta para `sources`
+
+**Obligatorios:**
+
+```text
+source_id
+document_id
+reference
+```
+
+**Opcionales:**
+
+```text
+page
+section
+```
+
+**Internos de Data/IA:**
+
+```text
+chunk_id
+similarity
+retrieval_rank
+identificadores internos de embeddings/vector store
+```
+
+### Pregunta pendiente
+
+> **¿Qué información necesita realmente Frontend para presentar la trazabilidad al usuario?**
+
+Esta pregunta debe resolverse con FE y BE antes de cerrar el esquema definitivo.
+
+**Responsables:** FE + BE, con validación de Data.
+
+---
+
+## 3.3 Tipos y restricciones
+
+**Estado:** 🔴 PENDIENTE
+
+Algunos enums ya están definidos:
+
+```text
+profile:
+  JUNIOR
+  SENIOR
+  EJECUTIVO
+
+format:
+  FLASHCARD
+  QUIZ
+  EXECUTIVE_SUMMARY
+  MIND_MAP
+```
+
+Faltan restricciones como:
+
+```text
+title.maxLength
+document.text.maxLength
+sources.maxItems
+content.maxItems
+```
+
+### Pregunta pendiente
+
+> **¿Qué límites de tamaño y cardinalidad puede soportar el MVP sin afectar la integración?**
+
+**Responsables:** BE + Data.
+
+---
+
+## 3.4 `contract_version`
+
+**Estado:** 🟡 PARCIALMENTE DEFINIDO
+
+Ya existe:
+
+```json
+{
+  "contract_version": "1.0"
+}
+```
+
+### Propuesta
+
+Utilizar:
+
+```text
+MAJOR.MINOR
+```
+
+Ejemplo:
+
+```text
+1.0
+1.1
+1.2
+2.0
+```
+
+### Pregunta pendiente
+
+> **¿Qué tipo de cambio incrementará MINOR y qué tipo de cambio obligará a una nueva versión MAJOR?**
+
+**Responsable:** BE + Data.
+
+---
+
+## 3.5 Compatibilidad entre versiones
+
+**Estado:** 🔴 PENDIENTE
+
+Debe definirse qué ocurre si dos componentes utilizan versiones distintas.
+
+Ejemplo:
+
+```text
+BE → contrato 1.0
+Data → contrato 1.1
+```
+
+### Pregunta pendiente
+
+> **¿El MVP necesita soportar simultáneamente más de una versión del contrato o podemos trabajar con una única versión coordinada?**
+
+**Responsable:** BE + Data.
+
+---
+
+# 4. 23.2 Documento de entrada
+
+## 4.1 Extracción de PDF / Markdown / etc.
+
+**Estado:** 🔴 PENDIENTE
+
+El contrato actual deja pendiente quién realiza la extracción.
+
+### Propuesta de flujo
+
+```text
+FE
+ ↓
+BE
+ ↓
+Extracción / normalización
+ ↓
+Data
+```
+
+La propuesta parte de que Backend recibe y controla la entrada pública, mientras Data recibe texto normalizado.
+
+### Pregunta pendiente
+
+> **¿BE será responsable de extraer y normalizar los documentos antes de enviarlos a Data, o Data recibirá también archivos y será responsable de la extracción?**
+
+**Responsables:** BE + Data.
+
+---
+
+## 4.2 Formato de texto normalizado
+
+**Estado:** 🔴 PENDIENTE
+
+La idea es que Data reciba una representación textual estable:
+
+```json
+{
+  "title": "Título del documento",
+  "text": "Texto limpio y normalizado",
+  "source": "origen"
+}
+```
+
+### Pregunta pendiente
+
+> **¿Qué reglas mínimas de normalización necesita Data para garantizar que el texto recibido sea procesable?**
+
+**Responsables:** Data + BE.
+
+---
+
+## 4.3 Tamaño máximo del documento
+
+**Estado:** 🔴 PENDIENTE
+
+Todavía no se define un valor concreto.
+
+### Debe considerar
+
+- extracción;
+- contexto;
+- RAG;
+- tiempo de procesamiento;
+- recursos;
+- límites de la infraestructura.
+
+### Pregunta pendiente
+
+> **¿Cuál será el tamaño máximo de documento aceptado por el MVP y dónde se validará ese límite?**
+
+**Responsable:** BE + Data.
+
+---
+
+## 4.4 Documentos por referencia
+
+**Estado:** 🔴 PENDIENTE
+
+Alternativa a enviar todo el texto:
+
+```json
+{
+  "document_id": "doc_456"
+}
+```
+
+en lugar de:
+
+```json
+{
+  "document": {
+    "text": "..."
+  }
+}
+```
+
+### Propuesta MVP
+
+Inicialmente podría utilizarse:
+
+```text
+document.title
+document.text
+```
+
+y dejar la referencia a documentos almacenados para una evolución posterior, si no es necesaria para el MVP.
+
+### Pregunta pendiente
+
+> **¿El MVP necesita recibir documentos por referencia o basta con recibir el texto normalizado directamente?**
+
+**Responsables:** BE + Data.
+
+---
+
+# 5. 23.3 Perfiles
+
+Los perfiles del MVP ya están acordados:
+
+```text
+JUNIOR
+SENIOR
+EJECUTIVO
+```
+
+Lo pendiente son las reglas de adaptación.
+
+## 5.1 Propuesta de matriz
+
+| Característica | JUNIOR | SENIOR | EJECUTIVO |
+|---|---|---|---|
+| Profundidad | Pendiente | Pendiente | Pendiente |
+| Lenguaje | Pendiente | Pendiente | Pendiente |
+| Ejemplos | Pendiente | Pendiente | Pendiente |
+| Longitud | Pendiente | Pendiente | Pendiente |
+| Conocimiento previo | Pendiente | Pendiente | Pendiente |
+
+### Pregunta pendiente
+
+> **¿Qué reglas concretas diferencian a JUNIOR, SENIOR y EJECUTIVO para que Data pueda aplicarlas de forma consistente?**
+
+**Responsable principal:** Data.
+
+---
+
+# 6. 23.4 Formatos
+
+Los formatos MVP ya están acordados:
+
+```text
+FLASHCARD
+QUIZ
+EXECUTIVE_SUMMARY
+MIND_MAP
+```
+
+## 6.1 FLASHCARD
+
+Debe definirse:
+
+```text
+cantidad
+pregunta
+respuesta
+explicación
+ejemplo
+fuente
+```
+
+### Ejemplo conceptual
+
+```json
+{
+  "question": "¿Qué es X?",
+  "answer": "...",
+  "explanation": "...",
+  "source_ids": ["src_001"]
+}
+```
+
+### Pregunta pendiente
+
+> **¿Cuál es la estructura mínima y los límites de una Flashcard para el MVP?**
+
+**Responsable:** Data, validación de FE.
+
+---
+
+## 6.2 QUIZ
+
+Debe definirse:
+
+```text
+cantidad de preguntas
+cantidad de opciones
+single/multiple choice
+respuesta correcta
+explicación
+fuente
+```
+
+### Pregunta pendiente
+
+> **¿Qué estructura y límites debe tener un Quiz MVP?**
+
+**Responsable:** Data, validación de FE.
+
+---
+
+## 6.3 EXECUTIVE_SUMMARY
+
+Debe definirse:
+
+```text
+longitud
+puntos clave
+conclusiones
+conceptos técnicos
+fuentes
+```
+
+### Pregunta pendiente
+
+> **¿Qué estructura mínima debe tener un Resumen Ejecutivo y qué límite de extensión tendrá?**
+
+**Responsable:** Data, validación de FE.
+
+---
+
+## 6.4 MIND_MAP
+
+Debe definirse:
+
+```text
+nodo raíz
+profundidad máxima
+cantidad máxima de nodos
+relación padre/hijo
+fuentes
+```
+
+El Mapa Mental forma parte del MVP al mismo nivel que los otros tres formatos.
+
+### Pregunta pendiente
+
+> **¿Cuál será la estructura mínima y los límites del Mapa Mental para que FE pueda representarlo de forma estable?**
+
+**Responsables:** Data + FE.
+
+---
+
+# 7. 23.5 Parámetros adicionales
+
+Los documentos anteriores contemplaban:
+
+```text
 nicho_sector
 nivel_detalle
 ```
 
-Estos campos **no deben considerarse obligatorios todavía**.
+**Estado:** 🔴 PENDIENTE.
 
-### Decisión pendiente
+### Propuesta
 
-Definir si:
+No agregarlos automáticamente al contrato MVP.
 
--   forman parte del MVP;
--   son opcionales;
--   se eliminan del contrato V1;
--   o se incorporan en una versión posterior.
+Primero debe demostrarse que son necesarios para los cuatro formatos y tres perfiles.
 
-------------------------------------------------------------------------
+### Pregunta pendiente
 
-# 5. Respuesta DS → BE
+> **¿`nicho_sector` y `nivel_detalle` aportan valor necesario para el MVP o deben quedar fuera de V1?**
 
-Data debe devolver un resultado estructurado y trazable.
+**Responsables:** Data + BE + FE.
 
-### Estructura conceptual
+---
 
-``` json
-{
-  "contract_version": "1.0",
-  "request_id": "req_123",
-  "document_id": "doc_456",
-  "profile": "JUNIOR",
-  "format": "FLASHCARD",
-  "status": "APPROVED",
-  "metadata": {},
-  "content": {},
-  "sources": [],
-  "validation": {},
-  "pipeline_version": "..."
-}
+# 8. 23.6 RAG / Data
+
+## 8.1 `top_k`
+
+**Estado:** 🔴 PENDIENTE
+
+Debe probarse experimentalmente.
+
+Ejemplo de evaluación:
+
+```text
+top_k = 3
+top_k = 5
+top_k = 8
 ```
 
-------------------------------------------------------------------------
+Evaluar:
 
-## 5.1 Campos
-
-  Campo                Estado      Descripción
-  -------------------- ----------- ---------------------------------
-  `contract_version`   ACORDADO    Versión del contrato
-  `request_id`         ACORDADO    Correlación de la solicitud
-  `document_id`        ACORDADO    Documento procesado
-  `profile`            ACORDADO    Perfil utilizado
-  `format`             ACORDADO    Formato generado
-  `status`             ACORDADO    Resultado de validación/proceso
-  `metadata`           ACORDADO    Metadatos funcionales
-  `content`            ACORDADO    Contenido generado
-  `sources`            ACORDADO    Trazabilidad de fuentes
-  `validation`         ACORDADO    Resultado de validación
-  `pipeline_version`   PROPUESTO   Versión interna del pipeline
-
-------------------------------------------------------------------------
-
-# 6. Estados de validación Data/IA
-
-Los estados definidos actualmente son:
-
-``` text
-APPROVED
-REQUIRES_ADJUSTMENT
-REJECTED
+```text
+fidelidad
+contexto
+ruido
+tokens
+tiempo
 ```
 
-### Interpretación
+### Pregunta pendiente
 
-  Estado                  Significado
-  ----------------------- -------------------------------------------------------
-  `APPROVED`              El resultado cumple las reglas de validación
-  `REQUIRES_ADJUSTMENT`   El resultado requiere ajuste/reintento
-  `REJECTED`              El resultado no debe entregarse como resultado válido
+> **¿Qué valor de `top_k` ofrece el mejor equilibrio para el MVP según las pruebas de Data?**
 
-> Un resultado rechazado no debe ser presentado por Backend como una
-> generación exitosa.
+**Responsable:** Data.
 
-------------------------------------------------------------------------
+---
 
-# 7. Fuentes y trazabilidad
+## 8.2 Similarity threshold
 
-El resultado debe permitir identificar de dónde proviene la información
-utilizada para generar el contenido.
+**Estado:** 🔴 PENDIENTE
 
-La trazabilidad debe ser suficiente para que Backend y Frontend puedan
-identificar y, cuando corresponda, mostrar al usuario la fuente de origen,
-sin exponer detalles internos de la implementación de Data/IA.
+No debe asumirse todavía un valor como:
 
-## 7.1 Esquema propuesto de `sources`
+```text
+0.85
+```
 
-Se propone inicialmente la siguiente estructura:
+El valor debe validarse experimentalmente.
+
+### Pregunta pendiente
+
+> **¿Data necesita un similarity threshold explícito y qué valor se obtiene de las pruebas?**
+
+**Responsable:** Data.
+
+---
+
+## 8.3 Contexto insuficiente
+
+**Estado:** 🟡 REQUIERE DEFINICIÓN
+
+Si RAG no encuentra suficiente evidencia, no se debe inventar contenido.
+
+### Propuesta
+
+Introducir un estado/error específico, por ejemplo:
+
+```text
+INSUFFICIENT_CONTEXT
+```
+
+### Pregunta pendiente
+
+> **¿Qué condición determina que el contexto sea insuficiente y qué respuesta debe devolver Data en ese caso?**
+
+**Responsable:** Data.
+
+---
+
+## 8.4 Límite de contexto
+
+**Estado:** 🔴 PENDIENTE
+
+Debe definirse según:
+
+```text
+modelo
+tokens
+costos
+RAG
+documento
+```
+
+### Pregunta pendiente
+
+> **¿Cuál será el límite máximo de contexto utilizado por Data en el MVP?**
+
+**Responsable:** Data.
+
+---
+
+## 8.5 Límite de salida
+
+**Estado:** 🔴 PENDIENTE
+
+Debe definirse por formato.
+
+```text
+Flashcard → cantidad máxima
+Quiz → cantidad máxima
+Summary → extensión máxima
+Mind Map → nodos máximos
+```
+
+### Pregunta pendiente
+
+> **¿Cuáles serán los límites máximos de salida por formato?**
+
+**Responsable:** Data + FE.
+
+---
+
+## 8.6 Retries internos
+
+**Estado:** 🔴 PENDIENTE
+
+Debe distinguirse:
+
+```text
+retryable
+non-retryable
+```
+
+### Pregunta pendiente
+
+> **¿Qué errores puede reintentar Data internamente y cuántos intentos máximos tendrá?**
+
+**Responsable:** Data.
+
+---
+
+# 9. 23.7 Validación
+
+## 9.1 `APPROVED`
+
+Debe cumplir las reglas acordadas.
+
+Propuesta de criterios:
+
+```text
+estructura correcta
+formato correcto
+perfil correcto
+fuentes válidas
+contenido basado en contexto
+```
+
+**Estado:** 🟡 Propuesta pendiente de validación.
+
+---
+
+## 9.2 `REQUIRES_ADJUSTMENT`
+
+Debe utilizarse cuando el resultado tiene posibilidad de ser corregido mediante regeneración o ajuste.
+
+### Pregunta pendiente
+
+> **¿Qué condiciones provocan un ajuste/reintento en lugar de rechazo definitivo?**
+
+**Responsable:** Data.
+
+---
+
+## 9.3 `REJECTED`
+
+Debe significar que el resultado no puede entregarse como válido.
+
+### Pregunta pendiente
+
+> **¿Qué condiciones obligan a rechazar definitivamente una generación?**
+
+**Responsable:** Data.
+
+---
+
+## 9.4 Score de calidad
+
+**Estado:** 🔴 PENDIENTE
+
+El valor:
+
+```text
+anclaje_fuente_score >= 0.85
+```
+
+se mantiene como hipótesis, no como regla definitiva.
+
+### Pregunta pendiente
+
+> **¿Data utilizará un score de calidad en V1 y cómo se calculará de forma reproducible?**
+
+**Responsable:** Data.
+
+---
+
+# 10. 23.8 Errores
+
+## 10.1 Catálogo de errores
+
+**Estado:** 🔴 PENDIENTE
+
+Propuesta inicial:
+
+```text
+INVALID_PROFILE
+INVALID_FORMAT
+EMPTY_DOCUMENT
+DOCUMENT_TOO_LARGE
+INSUFFICIENT_CONTEXT
+DS_TIMEOUT
+DS_ERROR
+VALIDATION_REJECTED
+```
+
+Estos códigos son propuestas de trabajo y deben validarse.
+
+### Pregunta pendiente
+
+> **¿Cuál será el catálogo definitivo de errores y qué equipo es responsable de cada uno?**
+
+**Responsables:** BE + Data.
+
+---
+
+## 10.2 HTTP status
+
+**Estado:** 🔴 PENDIENTE
+
+BE debe definir los códigos HTTP correspondientes.
+
+### Pregunta pendiente
+
+> **¿Qué HTTP status utilizará BE para cada categoría de error?**
+
+**Responsable:** BE.
+
+---
+
+## 10.3 Retryable
+
+Cada error debe indicar:
 
 ```json
 {
-  "source_id": "src_001",
-  "document_id": "doc_456",
-  "reference": "manual.pdf - Introducción - página 12",
-  "page": 12,
-  "section": "Introducción"
+  "retryable": true
 }
 ```
 
-### 7.1.1 Clasificación inicial de campos
-
-| Campo | Estado propuesto | Descripción |
-|---|---|---|
-| `source_id` | **OBLIGATORIO** | Identificador de la fuente dentro de la respuesta |
-| `document_id` | **OBLIGATORIO** | Identificador del documento de origen |
-| `reference` | **OBLIGATORIO** | Referencia legible que permita identificar el origen de la información |
-| `page` | **OPCIONAL** | Número de página, cuando el tipo de documento disponga de esta información |
-| `section` | **OPCIONAL** | Sección o apartado de origen, cuando pueda identificarse |
-
-### 7.1.2 Ejemplo con información completa
-
-Para un documento con páginas y secciones:
+o:
 
 ```json
 {
-  "source_id": "src_001",
-  "document_id": "doc_456",
-  "reference": "manual.pdf - Introducción - página 12",
-  "page": 12,
-  "section": "Introducción"
+  "retryable": false
 }
 ```
 
-### 7.1.3 Ejemplo sin número de página
+### Pregunta pendiente
 
-Para un documento que no maneje páginas, por ejemplo Markdown:
+> **¿Qué errores son reintentables y cuáles deben finalizar inmediatamente?**
 
-```json
-{
-  "source_id": "src_002",
-  "document_id": "doc_789",
-  "reference": "README.md - Instalación",
-  "section": "Instalación"
-}
+**Responsables:** BE + Data.
+
+---
+
+## 10.4 Mensaje público
+
+El mensaje para FE debe ser distinto de los detalles técnicos internos.
+
+### Regla
+
+No exponer:
+
+```text
+stack trace
+prompts
+credenciales
+detalles internos del modelo
 ```
 
-En este caso `page` no debe ser obligatorio ni debe generarse
-artificialmente para cumplir el contrato.
+### Pregunta pendiente
 
-### 7.1.4 Información interna de Data/IA
+> **¿Qué información mínima debe recibir FE para mostrar un error útil sin exponer detalles internos?**
 
-Data puede utilizar información adicional para la trazabilidad interna
-del proceso RAG, por ejemplo:
+**Responsables:** BE + FE.
 
-```json
-{
-  "source_id": "src_001",
-  "document_id": "doc_456",
-  "chunk_id": "chunk_045",
-  "page": 12,
-  "section": "Introducción",
-  "similarity": 0.91,
-  "retrieval_rank": 1
-}
+---
+
+# 11. 23.9 Proceso
+
+## 11.1 Estados
+
+Propuesta actual:
+
+```text
+RECEIVED
+PROCESSING
+RETRIEVING
+GENERATING
+VALIDATING
+COMPLETED
 ```
 
-Los siguientes campos se consideran inicialmente **internos de Data/IA**
-y no forman parte del contrato público con Frontend:
+Errores:
 
-- `chunk_id`
-- `similarity`
-- `retrieval_rank`
-- identificadores internos de embeddings;
-- identificadores del vector store;
-- cualquier otro dato técnico utilizado por el proceso de retrieval.
-
-Esto permite que Data pueda modificar su implementación interna sin
-romper el contrato con Backend o Frontend.
-
-## 7.2 Propuesta de exposición hacia Frontend
-
-Frontend debería recibir únicamente la información necesaria para
-presentar la trazabilidad al usuario.
-
-Como propuesta inicial:
-
-```json
-{
-  "sources": [
-    {
-      "source_id": "src_001",
-      "document_id": "doc_456",
-      "reference": "manual.pdf - Introducción - página 12",
-      "page": 12,
-      "section": "Introducción"
-    }
-  ]
-}
+```text
+FAILED
+TIMEOUT
+CANCELLED
 ```
 
-La información técnica utilizada internamente por Data para el retrieval
-no debe ser una dependencia de Frontend.
+**Estado:** 🟡 Propuesta.
 
-## 7.3 PREGUNTA PENDIENTE PARA BE + FE
+### Pregunta pendiente
 
-> **¿Qué información necesita realmente Frontend para presentar la
-> trazabilidad al usuario?**
+> **¿Qué estados debe conocer FE y cuáles deben permanecer internos de BE/Data?**
 
-Esta decisión debe validarse antes de cerrar el esquema definitivo de
-`sources`.
+**Responsables:** BE + FE + Data.
 
-En particular, BE + FE deben confirmar:
+---
 
-- si `source_id` debe ser visible para Frontend;
-- si `document_id` debe ser visible para Frontend;
-- qué formato debe tener `reference`;
-- si `page` debe mostrarse al usuario cuando exista;
-- si `section` debe mostrarse al usuario cuando exista;
-- si Frontend necesita algún dato adicional para permitir al usuario
-  identificar o consultar la fuente.
+## 11.2 Transiciones
 
-### Propuesta inicial para revisión
+Propuesta:
 
-**Obligatorios:**
-
-- `source_id`
-- `document_id`
-- `reference`
-
-**Opcionales:**
-
-- `page`
-- `section`
-
-**Internos de Data/IA y no expuestos a FE:**
-
-- `chunk_id`
-- `similarity`
-- `retrieval_rank`
-- identificadores internos de embeddings/vector store
-
-> **Estado: PROPUESTA — PENDIENTE DE VALIDACIÓN CON BE + FE.**
-
-------------------------------------------------------------------------
-
-# 8. Knowledge Core
-
-Data utilizará una representación intermedia común para evitar ejecutar
-un RAG independiente por cada formato.
-
-### Concepto
-
-``` mermaid
-flowchart LR
-    DOC[Documento]
-    RAG[RAG / Retrieval]
-    KC[Knowledge Core]
-    F1[Flashcard]
-    F2[Quiz]
-    F3[Resumen]
-    F4[Mapa Mental]
-
-    DOC --> RAG
-    RAG --> KC
-    KC --> F1
-    KC --> F2
-    KC --> F3
-    KC --> F4
-```
-
-## 8.1 Estructura conceptual
-
-``` json
-{
-  "topic": "...",
-  "concepts": [],
-  "definitions": [],
-  "key_points": [],
-  "relationships": [],
-  "examples": [],
-  "procedures": [],
-  "comparisons": [],
-  "questions_candidates": [],
-  "sources": []
-}
-```
-
-### Estado
-
-**Arquitectura acordada conceptualmente.**
-
-### Pendiente
-
-Definir formalmente:
-
--   campos obligatorios;
--   campos opcionales;
--   tipos;
--   cardinalidad;
--   comportamiento cuando un campo no exista en la fuente;
--   relación entre Knowledge Core y `sources`.
-
-------------------------------------------------------------------------
-
-# 9. Reglas de los formatos MVP
-
-La existencia de los cuatro formatos está acordada, pero sus
-restricciones exactas todavía deben cerrarse.
-
-## 9.1 Flashcard
-
-Debe definirse:
-
--   número de tarjetas;
--   estructura pregunta/respuesta;
--   longitud máxima;
--   nivel de dificultad;
--   uso de ejemplos;
--   inclusión de explicación;
--   referencias a fuentes.
-
-## 9.2 Quiz
-
-Debe definirse:
-
--   número de preguntas;
--   número de opciones;
--   selección única o múltiple;
--   respuesta correcta;
--   explicación;
--   dificultad;
--   referencias a fuentes.
-
-## 9.3 Resumen Ejecutivo
-
-Debe definirse:
-
--   longitud máxima;
--   cantidad de puntos clave;
--   estructura;
--   tratamiento de conceptos técnicos;
--   inclusión de conclusiones;
--   fuentes.
-
-## 9.4 Mapa Mental
-
-Debe definirse:
-
--   nodo raíz;
--   profundidad máxima;
--   número máximo de nodos;
--   relación padre/hijo;
--   contenido de cada nodo;
--   posibilidad de incluir relaciones cruzadas;
--   fuentes.
-
-> Estas reglas son necesarias antes de considerar cerrado el contrato de
-> contenido.
-
-------------------------------------------------------------------------
-
-# 10. CONTRATO BE ↔ FE
-
-## 10.1 Propósito
-
-Backend expone a Frontend una API estable. Frontend no debe depender de
-la implementación interna de Data.
-
-``` mermaid
-flowchart LR
-    FE[Frontend]
-    API[BE API v1]
-    ORQ[Orquestación Backend]
-    DS[Data / IA]
-    STORAGE[OCI]
-
-    FE --> API
-    API --> ORQ
-    ORQ --> DS
-    DS --> ORQ
-    ORQ --> STORAGE
-    ORQ --> API
-    API --> FE
-```
-
-------------------------------------------------------------------------
-
-# 11. Endpoint principal
-
-## POST
-
-``` text
-POST /api/v1/adaptacion/generar
-```
-
-### Objetivo
-
-Solicitar la generación de contenido adaptado.
-
-### Solicitud conceptual
-
-``` json
-{
-  "document": {
-    "title": "Título",
-    "text": "Texto del documento"
-  },
-  "profile": "JUNIOR",
-  "format": "FLASHCARD"
-}
-```
-
-### Importante
-
-La propuesta original contempla también escenarios de archivo/binario o
-referencia a documentos almacenados, pero su incorporación al mínimo
-contractual todavía debe definirse.
-
-------------------------------------------------------------------------
-
-# 12. Respuesta BE → FE
-
-La respuesta pública deberá ocultar los detalles internos de IA.
-
-### Estructura propuesta
-
-``` json
-{
-  "status": "COMPLETED",
-  "request_id": "req_123",
-  "document_id": "doc_456",
-  "contract_version": "1.0",
-  "metadata": {},
-  "content": {},
-  "sources": [],
-  "validation": {},
-  "storage": {}
-}
-```
-
-------------------------------------------------------------------------
-
-# 13. Qué puede consumir FE
-
-FE puede depender de:
-
--   `status`;
--   `request_id`;
--   `document_id`;
--   `contract_version`;
--   `profile`;
--   `format`;
--   `metadata`;
--   `content`;
--   `sources`;
--   información pública de validación;
--   información pública de almacenamiento, si corresponde.
-
-## FE NO debe depender de:
-
--   prompts;
--   embeddings;
--   chunks internos;
--   similarity interna;
--   nombres de modelos;
--   tokens;
--   configuración de LangChain/LangGraph;
--   Chroma u otro vector store;
--   stack traces;
--   secretos;
--   configuración interna de OCI.
-
-------------------------------------------------------------------------
-
-# 14. Ciclo de vida de una solicitud
-
-Se propone utilizar estados de proceso independientes del resultado de
-validación.
-
-``` text
+```text
 RECEIVED
    ↓
 PROCESSING
@@ -681,527 +899,476 @@ VALIDATING
 COMPLETED
 ```
 
-Estados de fallo:
+### Pregunta pendiente
 
-``` text
-FAILED
-TIMEOUT
-CANCELLED
+> **¿Qué transiciones son válidas y qué ocurre cuando falla cada etapa?**
+
+**Responsables:** BE + Data.
+
+---
+
+## 11.3 Timeout
+
+Debe definirse:
+
+```text
+BE → DS
+solicitud total
+stream, si existe
 ```
 
-### Estado
+### Pregunta pendiente
 
-**PENDIENTE DE DEFINICIÓN FORMAL.**
+> **¿Cuál será el timeout máximo de la llamada BE → Data y de la solicitud completa?**
 
-Debe decidirse:
+**Responsables:** BE + Data.
 
--   catálogo definitivo;
--   transición permitida entre estados;
--   qué estados verá FE;
--   qué estados serán internos de BE;
--   qué estados serán reportados por Data.
+---
 
-------------------------------------------------------------------------
+## 11.4 Cancelación
 
-# 15. Errores
+**Estado:** 🔴 Pendiente / posiblemente fuera del MVP.
 
-Los errores deben ser estructurados y diferenciables.
+### Pregunta
 
-### Ejemplo
+> **¿FE necesita cancelar una generación en curso para el MVP?**
 
-``` json
-{
-  "status": "FAILED",
-  "error": {
-    "code": "UNSUPPORTED_FORMAT",
-    "message": "El formato solicitado no está disponible.",
-    "retryable": false
-  },
-  "request_id": "req_123"
-}
-```
+**Responsables:** FE + BE.
 
-## Debe existir una matriz de errores
+---
 
-  Código             HTTP Retryable   Responsable   Público
-  ----------- ----------- ----------- ------------- ---------
-  Pendiente     Pendiente Pendiente   BE/DS         Sí
-  Pendiente     Pendiente Pendiente   BE/DS         Sí
-  Pendiente     Pendiente Pendiente   BE/DS         Sí
+## 11.5 Idempotencia
 
-### Debe definirse
+Propuesta:
 
--   códigos;
--   HTTP status;
--   mensaje público;
--   `retryable`;
--   responsable;
--   comportamiento FE.
-
-------------------------------------------------------------------------
-
-# 16. Timeout y reintentos
-
-Debe establecerse explícitamente:
-
--   timeout BE → DS;
--   timeout total de solicitud;
--   timeout del stream, si existe;
--   cantidad máxima de retries;
--   qué errores permiten retry;
--   cuándo detener el proceso.
-
-**Estado: PENDIENTE DE DEFINICIÓN.**
-
-------------------------------------------------------------------------
-
-# 17. Idempotencia
-
-Debe definirse qué ocurre si FE envía dos veces la misma solicitud.
-
-Se debe decidir si el MVP utilizará:
-
-``` text
+```text
 idempotency_key
 ```
 
-o una estrategia equivalente.
-
 Objetivo:
 
--   evitar llamadas duplicadas a IA;
--   evitar duplicar procesamiento;
--   evitar duplicar objetos en OCI.
-
-**Estado: PENDIENTE DE DEFINICIÓN.**
-
-------------------------------------------------------------------------
-
-# 18. Persistencia OCI
-
-OCI pertenece a la responsabilidad de Backend/infraestructura.
-
-Flujo conceptual:
-
-``` text
-FE
- ↓
-BE
- ├──→ DS
- │     └── resultado
- │
- └──→ OCI
-       ├── documento original
-       └── resultado
+```text
+evitar procesamiento duplicado
+evitar llamadas duplicadas a IA
+evitar duplicación en OCI
 ```
 
-Data no debe depender directamente de OCI para cumplir el contrato BE ↔
-DS.
+### Pregunta pendiente
 
-### Pendiente
+> **¿La idempotencia es necesaria para el MVP o puede quedar fuera de V1?**
 
-Definir:
+**Responsables:** BE + Data.
 
--   qué objetos se almacenan;
--   naming convention;
--   estructura de carpetas/objetos;
--   cuándo se considera exitosa la persistencia;
--   qué ocurre si IA termina correctamente pero OCI falla;
--   si ese caso devuelve `COMPLETED`, `PARTIAL` o `FAILED`.
+---
 
-------------------------------------------------------------------------
+# 12. 23.10 Streaming
 
-# 19. Progreso / Streaming
+**Estado:** 🔴 PENDIENTE
 
-La propuesta original contempla un endpoint de progreso:
+La propuesta original contemplaba:
 
-``` text
+```text
 GET /api/v1/adaptacion/stream
 ```
 
-y propone SSE/WebSocket.
+con SSE/WebSocket.
 
-Sin embargo, para V1 todavía debe definirse:
+### Primera decisión
 
--   si el streaming forma parte del MVP;
--   transporte definitivo;
--   endpoint definitivo;
--   correlación con `request_id`;
--   eventos;
--   comportamiento ante desconexión;
--   si FE realmente necesita progreso en tiempo real.
+> **¿FE realmente necesita mostrar progreso en tiempo real para el MVP?**
+
+Si no:
+
+```text
+POST
+ ↓
+procesamiento
+ ↓
+respuesta
+```
+
+Si sí:
+
+```text
+POST → request_id
+       ↓
+SSE/WebSocket
+       ↓
+eventos
+```
 
 ### Si se mantiene
 
-La correlación recomendada conceptualmente sería:
+Definir:
 
-``` text
-POST /api/v1/adaptacion/generar
+- transporte;
+- endpoint;
+- eventos;
+- correlación;
+- desconexión;
+- estados visibles.
+
+**Responsables:** FE + BE.
+
+---
+
+# 13. 23.11 OCI
+
+## 13.1 Objetos
+
+Debe decidirse qué almacenar:
+
+```text
+documento original
+resultado generado
+metadata
+```
+
+### Pregunta
+
+> **¿Qué objetos son obligatorios para el MVP y cuáles no necesitan persistencia?**
+
+**Responsable:** BE + OCI.
+
+---
+
+## 13.2 Naming
+
+Propuesta conceptual:
+
+```text
+documents/{document_id}/original
+documents/{document_id}/results/{request_id}
+```
+
+**Estado:** Propuesta.
+
+### Pregunta
+
+> **¿Esta convención es adecuada para el almacenamiento del MVP?**
+
+**Responsable:** BE + OCI.
+
+---
+
+## 13.3 Retención
+
+### Pregunta
+
+> **¿Cuánto tiempo deben conservarse documentos y resultados en OCI durante el MVP?**
+
+**Responsable:** BE + OCI.
+
+---
+
+## 13.4 Error de persistencia
+
+Caso:
+
+```text
+IA → OK
+OCI → ERROR
+```
+
+### Pregunta
+
+> **¿Qué estado debe recibir FE cuando la generación es correcta pero falla la persistencia?**
+
+**Responsables:** BE + FE + OCI.
+
+---
+
+## 13.5 Éxito parcial
+
+Debe decidirse si existe:
+
+```text
+PARTIAL
+```
+
+o si el caso anterior se representa mediante:
+
+```text
+FAILED
+```
+
+### Pregunta
+
+> **¿El MVP necesita un estado PARTIAL o basta con COMPLETED/FAILED?**
+
+**Responsables:** BE + FE.
+
+---
+
+# 14. 23.12 Seguridad
+
+## 14.1 Autenticación
+
+**Estado:** 🔴 Pendiente.
+
+### Pregunta
+
+> **¿Qué mecanismo de autenticación necesita el MVP y será obligatorio para la demo?**
+
+**Responsable:** BE.
+
+---
+
+## 14.2 Autorización
+
+### Pregunta
+
+> **¿Qué usuarios/roles pueden generar, consultar y acceder a documentos?**
+
+**Responsable:** BE + FE.
+
+---
+
+## 14.3 Rate limit
+
+### Pregunta
+
+> **¿Qué límite de solicitudes debe aplicar BE para proteger el MVP?**
+
+**Responsable:** BE.
+
+---
+
+## 14.4 Límite de documento
+
+Debe estar alineado con la sección 4.3.
+
+> **No definir este límite dos veces en el contrato.**
+
+---
+
+## 14.5 Concurrencia
+
+### Pregunta
+
+> **¿Cuántas generaciones simultáneas soportará el MVP según los recursos disponibles?**
+
+**Responsables:** BE + Data + OCI.
+
+---
+
+## 14.6 Logs
+
+### Puede registrarse
+
+```text
+request_id
+document_id
+profile
+format
+status
+duración
+error_code
+```
+
+### No debe registrarse
+
+```text
+secretos
+credenciales
+tokens
+información sensible innecesaria
+```
+
+### Pregunta
+
+> **¿Qué campos de logging son necesarios para trazabilidad y diagnóstico sin registrar información sensible?**
+
+**Responsables:** BE + Data.
+
+---
+
+# 15. Priorización para la próxima reunión
+
+## Prioridad 1 — Cerrar para poder integrar
+
+```text
+1. Entrada del documento
+2. Campos obligatorios/opcionales
+3. Sources
+4. Perfiles
+5. Formatos
+6. Respuesta DS → BE
+7. Estados
+8. Errores
+9. Límites básicos
+```
+
+## Prioridad 2 — Cerrar antes de V1 definitiva
+
+```text
+10. JSON Schema
+11. Versionamiento
+12. RAG
+13. Validación
+14. Retries
+15. Timeout
+16. Idempotencia
+17. OCI
+```
+
+## Prioridad 3 — Decidir si realmente entra al MVP
+
+```text
+18. Streaming
+19. Cancelación
+20. Documentos por referencia
+21. Retención avanzada
+22. Compatibilidad multi-versión
+```
+
+---
+
+# 16. Método de decisión
+
+Cada pendiente debería terminar en uno de estos estados:
+
+```text
+ACORDADO
+PROPUESTO
+PENDIENTE DE DECISIÓN
+PENDIENTE DE PRUEBA
+FUERA DEL MVP
+```
+
+### Ejemplo: `sources`
+
+```text
+Estado actual:
+PENDIENTE
+
         ↓
-request_id = req_123
 
-GET /api/v1/adaptacion/stream/{request_id}
+Propuesta:
+source_id       obligatorio
+document_id     obligatorio
+reference       obligatorio
+page            opcional
+section         opcional
+
         ↓
-eventos de req_123
+
+Pregunta:
+¿Qué necesita realmente FE?
+
+        ↓
+
+Responsables:
+BE + FE + Data
+
+        ↓
+
+Resultado:
+ACORDADO / MODIFICAR PROPUESTA
 ```
 
-**Estado: PENDIENTE DE DEFINICIÓN.**
+---
 
-------------------------------------------------------------------------
+# 17. Regla para no sobrecargar el MVP
 
-# 20. Seguridad y límites
+No todos los puntos deben convertirse en funcionalidades.
 
-## Backend
+Antes de agregar un campo, parámetro o mecanismo debe preguntarse:
 
-Debe controlar:
+> **¿Es necesario para que el MVP funcione, se integre o pueda demostrarse?**
 
--   autenticación/autorización;
--   validación de entrada;
--   tamaño máximo del documento;
--   límites de concurrencia;
--   rate limiting;
--   seguridad;
--   prompt injection;
--   datos sensibles;
--   secretos;
--   logs.
+Si la respuesta es no, puede quedar:
 
-## Data
-
-Debe controlar:
-
--   límites de `top_k`;
--   tamaño del contexto;
--   límites de salida;
--   retries internos;
--   validación de contenido;
--   comportamiento ante contexto insuficiente.
-
-### Pendiente
-
-Definir valores concretos para cada límite.
-
-------------------------------------------------------------------------
-
-# 21. Lo que NO forma parte del contrato público
-
-No deben exponerse a FE:
-
-``` text
-Modelo LLM
-Prompt
-Embedding
-Vector store
-Chunk interno
-Similarity score interno
-Tokens
-Temperatura
-Chain/Graph interno
-Stack trace
-Credenciales
-Secretos
-Configuración OCI
+```text
+FUERA DEL MVP
 ```
 
-Esto permite evolucionar Data y Backend sin romper Frontend.
+o:
 
-------------------------------------------------------------------------
-
-# 22. Matriz de responsabilidades
-
-  Actividad                    FE        BE            Data/DS      OCI
-  --------------------------- ---- --------------- --------------- -----
-  Captura de parámetros        ✓                                   
-  Validación básica UI         ✓                                   
-  API pública                             ✓                        
-  IDs                                     ✓                        
-  Seguridad API                           ✓                        
-  Extracción de documento           **PENDIENTE**   **PENDIENTE**  
-  Normalización de texto                                  ✓        
-  Chunking                                                ✓        
-  Embeddings                                              ✓        
-  RAG                                                     ✓        
-  Knowledge Core                                          ✓        
-  Adaptación por perfil                                   ✓        
-  Adaptación por formato                                  ✓        
-  Validación IA                                           ✓        
-  Contrato BE ↔ DS                        ✓               ✓        
-  Contrato BE ↔ FE             ✓          ✓                        
-  Persistencia OCI                        ✓                          ✓
-  Presentación resultado       ✓                                   
-  Manejo público de errores               ✓                        
-  Trazabilidad                            ✓               ✓        
-
-------------------------------------------------------------------------
-
-# 23. DECISIONES PENDIENTES
-
-Esta sección es obligatoria antes de considerar el contrato
-completamente cerrado.
-
-## 23.1 Contrato
-
--   [ ] Definir JSON Schema formal.
--   [ ] Definir campos obligatorios/opcionales.
--   [ ] Definir tipos y restricciones.
--   [ ] Definir `contract_version`.
--   [ ] Definir compatibilidad entre versiones.
-
-## 23.2 Documento de entrada
-
--   [ ] Definir quién realiza la extracción de PDF/Markdown/etc.
--   [ ] Definir formato de texto normalizado.
--   [ ] Definir tamaño máximo.
--   [ ] Definir si se aceptan documentos por referencia.
-
-## 23.3 Perfil
-
--   [ ] Definir reglas concretas de JUNIOR.
--   [ ] Definir reglas concretas de SENIOR.
--   [ ] Definir reglas concretas de EJECUTIVO.
-
-## 23.4 Formatos
-
--   [ ] Definir restricciones de FLASHCARD.
--   [ ] Definir restricciones de QUIZ.
--   [ ] Definir restricciones de EXECUTIVE_SUMMARY.
--   [ ] Definir restricciones de MIND_MAP.
-
-## 23.5 Parámetros adicionales
-
--   [ ] Decidir `nicho_sector`.
--   [ ] Decidir `nivel_detalle`.
-
-## 23.6 RAG / Data
-
--   [ ] Definir `top_k`.
--   [ ] Definir similarity threshold, si corresponde.
--   [ ] Definir estrategia ante contexto insuficiente.
--   [ ] Definir límite de contexto.
--   [ ] Definir límite de salida.
--   [ ] Definir retries.
-
-> Los valores como `anclaje_fuente_score >= 0.85` no deben considerarse
-> definitivos hasta que Data los valide experimentalmente.
-
-## 23.7 Validación
-
--   [ ] Definir criterios de `APPROVED`.
--   [ ] Definir criterios de `REQUIRES_ADJUSTMENT`.
--   [ ] Definir criterios de `REJECTED`.
--   [ ] Definir si existe score de calidad.
--   [ ] Definir cómo se calcula y reproduce.
-
-## 23.8 Errores
-
--   [ ] Catálogo de códigos.
--   [ ] HTTP status.
--   [ ] Retryable / non-retryable.
--   [ ] Mensaje público.
--   [ ] Responsable del error.
-
-## 23.9 Proceso
-
--   [ ] Estados definitivos.
--   [ ] Transiciones.
--   [ ] Timeout.
--   [ ] Retries.
--   [ ] Cancelación.
--   [ ] Idempotencia.
-
-## 23.10 Streaming
-
--   [ ] Decidir si entra al MVP.
--   [ ] SSE/WebSocket.
--   [ ] Endpoint.
--   [ ] Eventos.
--   [ ] Correlación mediante `request_id`.
-
-## 23.11 OCI
-
--   [ ] Objetos que se almacenan.
--   [ ] Naming convention.
--   [ ] Estructura.
--   [ ] Retención.
--   [ ] Error de persistencia.
--   [ ] Política de éxito parcial.
-
-## 23.12 Seguridad
-
--   [ ] Autenticación.
--   [ ] Autorización.
--   [ ] Rate limit.
--   [ ] Límites de documento.
--   [ ] Límites de concurrencia.
--   [ ] Política de logs.
-
-------------------------------------------------------------------------
-
-# 24. Matriz de pruebas de integración
-
-Antes de cerrar V1, BE + Data deben probar como mínimo:
-
-  Caso                             Resultado esperado
-  -------------------------------- -------------------------------------
-  Perfil válido + formato válido   Éxito
-  Perfil inválido                  Error estructurado
-  Formato inválido                 Error estructurado
-  Documento vacío                  Error estructurado
-  Documento demasiado grande       Error estructurado
-  Contexto insuficiente            Estado definido por Data
-  Validación IA aprobada           Resultado entregable
-  Validación IA requiere ajuste    Reintento/estado definido
-  Validación IA rechazada          No reportar éxito
-  Error DS                         Error traducible por BE
-  Timeout DS                       Error controlado
-  Error OCI                        Comportamiento definido
-  Solicitud duplicada              Comportamiento idempotente definido
-  Sources válidas                  Trazabilidad verificable
-
-------------------------------------------------------------------------
-
-# 25. Definition of Done --- Data/IA
-
-Data/IA podrá considerarse integrado cuando:
-
--   [ ] Recibe el request definido por el contrato.
--   [ ] Procesa los perfiles acordados.
--   [ ] Procesa los cuatro formatos MVP.
--   [ ] Ejecuta RAG.
--   [ ] Construye Knowledge Core.
--   [ ] Genera contenido estructurado.
--   [ ] Devuelve fuentes.
--   [ ] Devuelve estado de validación.
--   [ ] Maneja errores estructurados.
--   [ ] Respeta límites acordados.
--   [ ] Tiene pruebas de los casos principales.
--   [ ] No depende directamente de OCI.
--   [ ] No obliga a BE a conocer su implementación interna.
-
-------------------------------------------------------------------------
-
-# 26. Definition of Done --- Backend
-
-BE podrá considerarse integrado cuando:
-
--   [ ] Expone la API pública versionada.
--   [ ] Valida requests.
--   [ ] Genera/gestiona IDs.
--   [ ] Invoca Data mediante el contrato interno.
--   [ ] Valida la respuesta de Data.
--   [ ] Traduce errores.
--   [ ] Gestiona timeout/retry.
--   [ ] Gestiona persistencia OCI según definición.
--   [ ] Expone una respuesta estable a FE.
--   [ ] No expone detalles internos de IA.
--   [ ] Tiene pruebas de integración.
-
-------------------------------------------------------------------------
-
-# 27. Definition of Done --- Frontend
-
-FE podrá considerarse integrado cuando:
-
--   [ ] Envía únicamente los campos definidos.
--   [ ] Utiliza los enums acordados.
--   [ ] Interpreta los estados definidos.
--   [ ] Presenta errores públicos.
--   [ ] Presenta contenido según el formato recibido.
--   [ ] Presenta fuentes cuando corresponda.
--   [ ] No depende de detalles internos de IA.
--   [ ] Maneja loading/processing.
--   [ ] Maneja timeout/error.
--   [ ] Maneja respuesta exitosa.
-
-------------------------------------------------------------------------
-
-# 28. Regla de cambios
-
-Cualquier cambio en:
-
--   campos;
--   enums;
--   estructura JSON;
--   endpoints;
--   estados;
--   códigos de error;
--   comportamiento;
-
-debe actualizar este contrato antes de que los equipos implementen el
-cambio.
-
-### Regla
-
-``` text
-Cambio de contrato
-       ↓
-Actualizar documento
-       ↓
-Alinear BE + Data + FE
-       ↓
-Actualizar código
-       ↓
-Actualizar pruebas
+```text
+V1.1 / FUTURO
 ```
 
-------------------------------------------------------------------------
+Esto aplica especialmente a:
 
-# 29. Estado del documento
+- `nicho_sector`
+- `nivel_detalle`
+- streaming
+- cancelación
+- documentos por referencia
+- compatibilidad multi-versión
+- métricas avanzadas
+- persistencia avanzada
 
-## ACORDADO
+---
 
--   Arquitectura desacoplada FE → BE → Data.
--   Perfiles MVP.
--   Formatos MVP.
--   Data es responsable del RAG y adaptación.
--   BE es responsable de API pública, orquestación y persistencia.
--   FE consume una interfaz estable.
--   Fuentes y trazabilidad son parte del resultado.
--   El contrato debe estar versionado.
--   Los errores deben ser estructurados.
--   La implementación interna de Data no forma parte del contrato
-    público.
+# 18. Resultado esperado
 
-## PENDIENTE
+La meta de esta revisión no es eliminar todos los pendientes inmediatamente.
 
-Los puntos de la sección **23. DECISIONES PENDIENTES** deben resolverse
-antes de marcar este contrato como **V1.0 DEFINITIVO**.
+La meta es transformar:
 
-------------------------------------------------------------------------
-
-# 30. Próximo paso recomendado
-
-La secuencia de trabajo debe ser:
-
-``` mermaid
-flowchart TD
-    A[Contrato V1.0 propuesta] --> B[Reunión BE + Data]
-    B --> C[Resolver contrato BE ↔ DS]
-    C --> D[Resolver reglas de formatos]
-    D --> E[Resolver errores / estados / límites]
-    E --> F[Resolver BE ↔ FE]
-    F --> G[JSON Schema / OpenAPI]
-    G --> H[Pruebas de contrato]
-    H --> I[Implementación]
+```text
+LISTA DE PENDIENTES
 ```
 
-### Prioridad
+en:
 
-**Primero cerrar BE ↔ Data.**
+```text
+DECISIONES CLARAS
+       +
+PROPUESTAS CONCRETAS
+       +
+PREGUNTAS DIRIGIDAS
+       +
+RESPONSABLES
+       +
+CRITERIOS DE VALIDACIÓN
+```
 
-Una vez establecida esa frontera, Backend puede construir la API pública
-y Frontend puede trabajar contra el contrato sin depender de la
-evolución interna de Data.
+Una vez resueltos los puntos bloqueantes:
 
-------------------------------------------------------------------------
+```text
+Contrato funcional
+      ↓
+JSON Schema
+      ↓
+OpenAPI
+      ↓
+Pruebas de contrato
+      ↓
+Implementación BE + Data + FE
+```
 
-## Referencias de trabajo
+---
 
-Este documento consolida las propuestas:
+# 19. Relación con `CONTRATO_INTEGRACION_V1.0.md`
 
--   `Propuesta_Marco_CONTRATOS_BACKEND_API.md`
--   `Propuesta_Jacqueline_Contrato_Data_Science_BE.md`
+Este documento es **complementario** al contrato.
 
-Ambas propuestas deben considerarse documentos de trabajo previos. Este
-archivo pasa a ser la referencia común para la alineación del equipo una
-vez aprobado.
+```text
+CONTRATO_INTEGRACION_V1.0.md
+        │
+        ├── Define el contrato
+        │
+        └── Se actualiza cuando una decisión queda acordada
+                 ↑
+                 │
+REVISION_PENDIENTES_CONTRATO_V1.0.md
+        │
+        ├── Analiza pendientes
+        ├── Presenta propuestas
+        ├── Formula preguntas
+        └── Prepara decisiones del equipo
+```
+
+> **Este documento no reemplaza el contrato.**
+> Sirve como documento de trabajo para cerrarlo.
+
+---
+
+## Estado
+
+**Versión:** 0.1  
+**Estado:** Propuesta para revisión BE + Data + FE  
+**Próximo paso:** Resolver primero los puntos de Prioridad 1 y actualizar `CONTRATO_INTEGRACION_V1.0.md` únicamente cuando las decisiones sean aprobadas.
