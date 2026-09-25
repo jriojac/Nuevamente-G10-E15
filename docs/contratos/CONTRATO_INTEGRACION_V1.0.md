@@ -994,22 +994,22 @@ Esto permite que Backend desarrolle y pruebe sin esperar al modelo real.
 
 ---
 
-# 31. Decisiones pendientes — SOLO LAS QUE REALMENTE FALTAN
+## 31. Decisiones pendientes — enfocadas en desbloquear Backend
 
-| # | Decisión | Responsable |
-|---:|---|---|
-| 1 | Quién extrae y normaliza el documento | BE + DS |
-| 2 | JSON Schema definitivo de los 4 formatos | DS + BE |
-| 3 | Campos mínimos de `validation` | DS + BE |
-| 4 | Información definitiva de `sources` para FE | DS + BE + FE |
-| 5 | Confirmar estados `APPROVED / REQUIRES_ADJUSTMENT / REJECTED` | DS + BE |
-| 6 | Catálogo definitivo de errores | BE + DS |
-| 7 | Timeout | BE + DS |
-| 8 | Retries | BE + DS |
-| 9 | Idempotencia | BE |
-| 10 | Límites de entrada/salida | BE + DS |
-| 11 | Qué persiste BE en OCI | BE |
-| 12 | Streaming dentro o fuera del MVP | BE + FE + DS |
+| # | Decisión | Prioridad para BE | Dónde está definido en el contrato | ¿Bloquea BE? |
+|---|---|---|---|---|
+| 1 | Quién extrae y normaliza el documento | 🔴 Ahora | §11 — Endpoint principal / documento de entrada | **Sí** |
+| 2 | JSON Schema definitivo de los 4 formatos | 🔴 Ahora | §9 — Contrato de contenido / formatos | **Sí** |
+| 3 | Campos mínimos de `validation` | 🟡 Inicial | §12 — Respuesta BE → FE | No |
+| 4 | Información definitiva de `sources` para FE | 🟢 Después | §12–13 — Respuesta / consumo FE | No |
+| 5 | Estados `APPROVED / REQUIRES_ADJUSTMENT / REJECTED` | 🔴 Ahora | §14 — Ciclo de vida / estados | **Sí** |
+| 6 | Catálogo definitivo de errores | 🔴 Ahora | §15 — Errores | **Sí** |
+| 7 | Timeout | 🔴 Ahora, valor inicial | §16 — Timeout y reintentos | **Sí** |
+| 8 | Retries | 🟡 Inicial | §16 — Timeout y reintentos | No |
+| 9 | Idempotencia | 🟡 Después | §17 — Idempotencia | No |
+| 10 | Límites de entrada/salida | 🔴 Ahora, valores iniciales | §20 — Seguridad y límites | **Sí** |
+| 11 | Qué persiste BE en OCI | 🟢 Después | §18 — Persistencia OCI | No |
+| 12 | Streaming dentro o fuera del MVP | 🟢 Después / fuera del MVP inicial | §19 — Progreso / Streaming | No |
 
 ### Ya definido y NO sujeto a discusión
 
