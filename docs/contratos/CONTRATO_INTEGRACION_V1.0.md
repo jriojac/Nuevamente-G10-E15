@@ -1007,9 +1007,9 @@ Esto permite que Backend desarrolle y pruebe sin esperar al modelo real.
 | 7 | **¿Cuál será el timeout máximo de la comunicación BE → DS?** | 🔴 Ahora | 19 — Timeout y retries | **Sí** |
 | 8 | **¿Cuántos retries hará BE ante un fallo de integración y cuáles errores serán reintentables?** | 🟡 Inicial | 19 — Timeout y retries | No |
 | 9 | **¿`request_id` será también la clave de idempotencia o se utilizará un `idempotency_key` separado?** | 🟡 Después | 20 — Idempotencia | No |
-| 10 | **¿Cuáles serán los límites máximos de entrada, procesamiento y salida?** | 🔴 Ahora, valores iniciales | §22 — Límites del MVP | **Sí** |
-| 11 | **¿Qué debe persistir Backend en OCI: documento original, resultado generado o ambos?** | 🟢 Después | §24 — OCI | No |
-| 12 | **¿Streaming forma parte del MVP o queda para una versión posterior?** | 🟢 Después | §25 — Streaming / progreso | No |
+| 10 | **¿Cuáles serán los límites máximos de entrada, procesamiento y salida?** | 🔴 Ahora, valores iniciales | 22 — Límites del MVP | **Sí** |
+| 11 | **¿Qué debe persistir Backend en OCI: documento original, resultado generado o ambos?** | 🟢 Después | 24 — OCI | No |
+| 12 | **¿Streaming forma parte del MVP o queda para una versión posterior?** | 🟢 Después | 25 — Streaming / progreso | No |
 
 ### Ya definido y NO sujeto a discusión
 
@@ -1033,26 +1033,107 @@ FUERA DEL MVP
 
 # 32. Definition of Done — Contrato DS ↔ BE
 
-El contrato queda cerrado cuando:
+El contrato se considera **habilitado para iniciar el desarrollo de Backend** cuando las decisiones clasificadas como 🔴 **Ahora** en el punto 31 hayan sido cerradas.
 
-- [x] 3 perfiles definidos.
-- [x] 4 formatos definidos.
-- [x] `STEP_BY_STEP` fuera del MVP.
+Las decisiones 🟡 **Inicial** y 🟢 **Después** pueden permanecer abiertas sin bloquear el inicio del desarrollo, siempre que no afecten la estructura base del contrato.
+
+---
+
+## 32.1 🔴 Decisiones que deben cerrarse para iniciar Backend
+
+Estas decisiones son **bloqueantes** para Backend y deben estar definidas antes de considerar estable el contrato mínimo de integración:
+
 - [ ] Request aprobado.
 - [ ] Response aprobado.
-- [ ] Schema de cada formato definido.
-- [ ] Sources aprobado.
-- [ ] Estados aprobados.
-- [ ] Validation definido.
-- [ ] Errores aprobados.
-- [ ] Responsabilidad de extracción del documento definida.
-- [ ] Timeout definido.
+- [ ] Schema de `FLASHCARD` aprobado.
+- [ ] Schema de `QUIZ` aprobado.
+- [ ] Schema de `EXECUTIVE_SUMMARY` aprobado.
+- [ ] Schema de `MIND_MAP` aprobado.
+- [ ] Estados `APPROVED`, `REQUIRES_ADJUSTMENT` y `REJECTED` aprobados.
+- [ ] Catálogo de errores aprobado.
+- [ ] Responsabilidad de extracción y normalización del documento definida.
+- [ ] Timeout máximo de la comunicación BE → DS definido.
+- [ ] Límites máximos de entrada, procesamiento y salida definidos.
+
+### Resultado
+
+Una vez cerrados estos puntos:
+
+> **Backend puede iniciar y avanzar utilizando un Mock de Data/IA, sin esperar a que el pipeline real de Data/IA esté terminado.**
+
+---
+
+## 32.2 🟡 Decisiones importantes para la implementación inicial
+
+Estas decisiones son necesarias para completar la implementación, pero **no bloquean el inicio del desarrollo de Backend**:
+
+- [ ] Campos mínimos de `validation` definidos.
 - [ ] Retries definidos.
+- [ ] Criterios para determinar qué errores son reintentables definidos.
+- [ ] Estructura de `sources` validada para el consumo de Frontend.
 - [ ] Idempotencia definida.
+
+Mientras estas decisiones permanezcan abiertas, los equipos pueden trabajar con una definición provisional compatible con el contrato.
+
+Cualquier decisión provisional que posteriormente modifique el contrato deberá ser actualizada y comunicada entre los equipos involucrados.
+
+---
+
+## 32.3 🟢 Decisiones que pueden cerrarse después
+
+Estas decisiones no deben bloquear el desarrollo inicial del MVP:
+
+- [ ] Qué información debe persistir Backend en OCI.
+- [ ] Si se persiste el documento original, el resultado generado o ambos.
+- [ ] Streaming definido como parte del MVP o como evolución posterior.
+- [ ] Detalles adicionales relacionados con persistencia y progreso.
+
+Estas decisiones pueden cerrarse posteriormente, una vez validado el flujo principal:
+
+**DS/IA → Backend → Frontend**
+
+---
+
+## 32.4 Regla de trabajo en paralelo
+
+Mientras existan decisiones 🟡 o 🟢 pendientes:
+
+> **Backend puede continuar desarrollando contra el contrato mínimo y un Mock de Data/IA.**
+
+> **Data/IA puede continuar desarrollando y validando su pipeline sin bloquear el desarrollo de Backend.**
+
+> **Frontend puede avanzar utilizando el contrato de respuesta acordado y datos Mock mientras se completa la integración real.**
+
+> **Cualquier cambio posterior que afecte Request, Response, enums o schemas debe actualizar este contrato y comunicarse al equipo correspondiente.**
+
+---
+
+## 32.5 Cierre completo del contrato
+
+El contrato se considera **completamente cerrado** cuando todas las decisiones definidas en los puntos 🔴, 🟡 y 🟢 hayan sido resueltas:
+
+- [ ] Request aprobado.
+- [ ] Response aprobado.
+- [ ] Schemas de los 4 formatos aprobados.
+- [ ] Estados aprobados.
+- [ ] Catálogo de errores aprobado.
+- [ ] Responsabilidad de extracción y normalización definida.
+- [ ] Timeout definido.
 - [ ] Límites definidos.
-- [ ] OCI definido.
-- [ ] Streaming definido como MVP o futuro.
+- [ ] Validation definido.
+- [ ] Sources validado.
+- [ ] Retries definidos.
+- [ ] Criterios de reintento definidos.
+- [ ] Idempotencia definida.
+- [ ] Persistencia OCI definida.
+- [ ] Streaming definido como MVP o evolución posterior.
 - [ ] `contract_version = 1.0` aprobado.
+
+### Regla final
+
+> **El cierre completo del contrato no es requisito para comenzar el desarrollo.**
+
+> **Las decisiones 🔴 habilitan el inicio de Backend; las 🟡 completan la implementación inicial; y las 🟢 pueden resolverse durante la evolución del MVP.**
 
 ---
 
