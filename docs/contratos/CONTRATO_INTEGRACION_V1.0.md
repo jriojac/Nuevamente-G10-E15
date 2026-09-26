@@ -1,7 +1,7 @@
 
 # CONTRATO DE INTEGRACIÓN DATA/IA ↔ BACKEND — V1.1
 
-## TechMind / NuevaMente — G10 LATAM Equipo 15
+## NuevaMente — G10 LATAM Equipo 15
 
 **Estado:** Propuesta para cierre y aprobación  
 **Objetivo:** permitir que Backend y Data/IA trabajen en paralelo con una frontera de integración clara, simple y estable.
