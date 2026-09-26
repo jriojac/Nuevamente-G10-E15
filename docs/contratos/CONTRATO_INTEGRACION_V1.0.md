@@ -8,7 +8,7 @@
 
 ---
 
-# 1. Objetivo del contrato
+# 🔴 1. Objetivo del contrato 
 
 Este documento define de forma clara:
 
@@ -26,7 +26,7 @@ Backend no necesita conocer la implementación interna de Data/IA y Data/IA no n
 
 ---
 
-# 2. Alcance del MVP — YA DEFINIDO
+# 🔴 2. Alcance del MVP — YA DEFINIDO
 
 ## 2.1 Perfiles
 
@@ -123,7 +123,7 @@ DS → BE
 
 ---
 
-# 5. Contrato BE → DS
+# 🔴 5. Contrato BE → DS
 
 Backend enviará a Data/IA una solicitud con esta estructura:
 
@@ -143,7 +143,7 @@ Backend enviará a Data/IA una solicitud con esta estructura:
 
 ---
 
-# 6. Campos del Request
+# 🔴 6. Campos del Request
 
 | Campo | Tipo | Obligatorio | Descripción |
 |---|---|---:|---|
@@ -157,7 +157,7 @@ Backend enviará a Data/IA una solicitud con esta estructura:
 
 ---
 
-# 7. Documento de entrada
+# 🔴 7. Documento de entrada
 
 El contrato trabaja con **texto normalizado**, no con un formato de archivo específico.
 
@@ -330,7 +330,7 @@ Ejemplo:
 
 ---
 
-# 10. Estructura común de `content`
+# 🔴 10. Estructura común de `content`
 
 Todos los formatos utilizan:
 
