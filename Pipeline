@@ -1,0 +1,1093 @@
+# DATA/IA — PIPELINE MVP DE NUEVAMENTE
+
+**Proyecto:** NuevaMente
+**Equipo:** G10-LATAM — Equipo 15
+**Área:** Data / IA
+**Versión:** 0.1 — Propuesta base
+**Estado:** Propuesta para validación del equipo
+**Fecha:** 26/09/2026
+
+---
+
+## 1. Propósito del documento
+
+Este documento define la **propuesta base del pipeline de Data/IA para el MVP de NuevaMente**.
+
+El objetivo es establecer primero una arquitectura propia y coherente para el procesamiento de documentos antes de evaluar propuestas, mejoras o alternativas planteadas posteriormente por los integrantes del equipo.
+
+Esta propuesta servirá como referencia para:
+
+* definir las responsabilidades de Data/IA;
+* organizar los Issues de IA/Data;
+* validar la integración con Backend;
+* identificar decisiones pendientes;
+* evaluar propuestas técnicas posteriores;
+* evitar agregar complejidad que no sea necesaria para el MVP.
+
+> **Importante:** este documento representa una **línea base propuesta**, no una arquitectura definitiva. Las decisiones que requieran validación del equipo deberán quedar explícitamente marcadas como pendientes.
+
+---
+
+# 2. Objetivo funcional de NuevaMente
+
+NuevaMente busca transformar documentación técnica en contenido educativo adaptado a un perfil y formato determinados.
+
+El flujo conceptual es:
+
+```mermaid
+flowchart LR
+    A[Documento técnico] --> B[Procesamiento Data/IA]
+    B --> C[Comprensión del contenido]
+    C --> D[Adaptación pedagógica]
+    D --> E[Contenido educativo]
+```
+
+El sistema recibe información sobre:
+
+* documento;
+* perfil del usuario;
+* formato solicitado.
+
+Y genera contenido adaptado, manteniendo trazabilidad hacia la información original.
+
+Por lo tanto, **NuevaMente no se plantea en el MVP como un chatbot tradicional de preguntas y respuestas**.
+
+El RAG se utiliza principalmente para:
+
+> encontrar y proporcionar al modelo el contexto relevante que permita generar contenido educativo basado en la documentación fuente.
+
+Esto es consistente con la definición funcional existente del proyecto.
+
+---
+
+# 3. Principios de diseño
+
+La propuesta se basa en los siguientes principios.
+
+## 3.1 MVP primero
+
+La arquitectura debe resolver el problema principal sin incorporar componentes cuya utilidad todavía no haya sido demostrada.
+
+Por ello, tecnologías como:
+
+* GraphRAG;
+* Knowledge Graph avanzado;
+* NLI complejo;
+* LLM-as-a-Judge sofisticado;
+* múltiples estrategias de retrieval;
+* agentes autónomos;
+
+se consideran **posibles evoluciones**, no requisitos iniciales del MVP.
+
+---
+
+## 3.2 Separación de responsabilidades
+
+Data/IA debe encargarse de la lógica de procesamiento inteligente.
+
+Backend no necesita conocer detalles como:
+
+* embeddings;
+* chunks;
+* vector store;
+* similarity score;
+* prompts;
+* modelo LLM;
+* estrategia RAG.
+
+Esto coincide con la separación establecida en el contrato BE ↔ Data/IA V1.1.
+
+---
+
+## 3.3 Evidencia antes que generación
+
+La generación debe estar basada en información recuperada del documento.
+
+Regla fundamental:
+
+> **Si el sistema no encuentra evidencia suficiente, no debe inventar contenido.**
+
+El contrato actual contempla precisamente un comportamiento específico para contexto insuficiente.
+
+---
+
+## 3.4 Componentes reemplazables
+
+Cuando sea posible, las decisiones internas deben permitir cambiar:
+
+* modelo de embeddings;
+* modelo LLM;
+* vector store;
+* estrategia de chunking;
+* estrategia de retrieval;
+
+sin modificar el contrato público con Backend.
+
+---
+
+# 4. Pipeline propuesto
+
+La propuesta inicial es:
+
+```mermaid
+flowchart TD
+
+    A[Backend] --> B[1. Ingesta]
+    
+    B --> C[2. Chunking]
+    
+    C --> D[3. Enriquecimiento]
+    
+    D --> E[4. Embeddings]
+    
+    D --> F[5. Knowledge Core]
+
+    E --> G[6. Query Builder]
+
+    F --> G
+
+    G --> H[7. Retrieval]
+
+    H --> I[8. Context Builder]
+
+    I --> J[9. Generación]
+
+    J --> K[10. Validación]
+
+    K -->|Aprobado| L[JSON de respuesta]
+    
+    K -->|No aprobado| M[Rechazo / Ajuste]
+
+    L --> A
+```
+
+---
+
+# 5. Vista simplificada
+
+Desde una perspectiva funcional:
+
+```text
+DOCUMENTO
+    │
+    ▼
+┌───────────────┐
+│    INGESTA    │
+└───────┬───────┘
+        ▼
+┌───────────────┐
+│   CHUNKING    │
+└───────┬───────┘
+        ▼
+┌───────────────┐
+│ ENRIQUECIMIENTO│
+└───────┬───────┘
+        │
+        ├──────────────► EMBEDDINGS
+        │
+        └──────────────► KNOWLEDGE CORE
+                              │
+                              ▼
+                        QUERY BUILDER
+                              │
+                              ▼
+                         RETRIEVAL
+                              │
+                              ▼
+                      CONTEXT BUILDER
+                              │
+                              ▼
+                         GENERACIÓN
+                              │
+                              ▼
+                         VALIDACIÓN
+                              │
+                    ┌─────────┴─────────┐
+                    ▼                   ▼
+                 APROBADO            RECHAZADO
+                    │
+                    ▼
+                  JSON
+                    │
+                    ▼
+                 BACKEND
+```
+
+---
+
+# 6. Etapa 1 — Ingesta
+
+## Objetivo
+
+Recibir el documento y convertirlo en una representación utilizable por el pipeline.
+
+El documento debe conservar, cuando sea posible, su estructura lógica:
+
+* títulos;
+* subtítulos;
+* párrafos;
+* listas;
+* tablas;
+* código;
+* secciones.
+
+La propuesta existente de Data/IA indica explícitamente que la extracción debe evitar perder la jerarquía del documento.
+
+---
+
+## Entrada
+
+La definición exacta de esta etapa todavía debe alinearse con Backend.
+
+El contrato V1.1 actualmente trabaja con:
+
+```json
+{
+  "document": {
+    "document_id": "doc_456",
+    "title": "Introducción a Redes en OCI",
+    "text": "Texto normalizado del documento..."
+  }
+}
+```
+
+Por tanto, existe una decisión pendiente:
+
+> ¿Quién realiza la extracción y normalización inicial del archivo?
+
+El contrato actual deja esta responsabilidad pendiente de definición.
+
+---
+
+# 7. Etapa 2 — Chunking
+
+## Objetivo
+
+Dividir el documento en unidades de información que puedan ser procesadas y recuperadas eficientemente.
+
+La propuesta inicial contempla **chunking semántico/estructural**, procurando no romper innecesariamente el significado del contenido.
+
+La propuesta previa también plantea una estrategia Parent-Child:
+
+```text
+DOCUMENTO
+│
+├── Sección A
+│   ├── Chunk A1
+│   ├── Chunk A2
+│   └── Chunk A3
+│
+├── Sección B
+│   ├── Chunk B1
+│   └── Chunk B2
+│
+└── Sección C
+    ├── Chunk C1
+    └── Chunk C2
+```
+
+Los chunks pequeños pueden utilizarse para la búsqueda, mientras que el contexto de la sección padre puede utilizarse posteriormente para la generación.
+
+### Decisión MVP
+
+La arquitectura soportará conceptualmente Parent-Child, pero:
+
+> **la implementación exacta debe mantenerse lo más simple posible hasta demostrar que aporta valor al retrieval.**
+
+---
+
+# 8. Etapa 3 — Enriquecimiento
+
+## Objetivo
+
+Agregar información que permita comprender y recuperar mejor el contenido desde una perspectiva pedagógica.
+
+Propuesta mínima de metadata:
+
+| Campo          | Propósito                     |
+| -------------- | ----------------------------- |
+| `document_id`  | Identificar documento         |
+| `chunk_id`     | Identificar fragmento         |
+| `section`      | Mantener contexto estructural |
+| `content_type` | Tipo de contenido             |
+| `concept`      | Concepto principal            |
+| `difficulty`   | Dificultad estimada           |
+| `source`       | Referencia al origen          |
+
+La propuesta de Data/IA plantea incorporar metadata pedagógica como conceptos clave, prerequisitos, dificultad y tipo de contenido.
+
+### Importante
+
+No se propone inicialmente enriquecer cada chunk con una gran cantidad de campos.
+
+La metadata debe responder a una pregunta:
+
+> **¿Esta información realmente ayuda a recuperar, organizar, adaptar o validar el contenido?**
+
+---
+
+# 9. Etapa 4 — Embeddings
+
+## Objetivo
+
+Transformar los chunks en representaciones vectoriales para permitir búsqueda semántica.
+
+Conceptualmente:
+
+```mermaid
+flowchart LR
+    A[Chunk] --> B[Modelo de Embeddings]
+    B --> C[Vector]
+    C --> D[Vector Store]
+```
+
+La arquitectura no fija todavía:
+
+* modelo específico;
+* dimensión;
+* proveedor;
+* threshold;
+* configuración definitiva.
+
+Estas decisiones pertenecen a la implementación interna de Data/IA.
+
+El contrato no necesita exponerlas a Backend.
+
+---
+
+# 10. Etapa 5 — Knowledge Core
+
+## Objetivo
+
+Construir una representación estructurada del conocimiento extraído del documento.
+
+El Knowledge Core es **interno a Data/IA**.
+
+No forma parte del contrato público con Backend.
+
+La estructura planteada actualmente contempla elementos como:
+
+```text
+Knowledge Core
+│
+├── topic
+├── concepts
+├── definitions
+├── key_points
+├── relationships
+├── examples
+├── procedures
+├── comparisons
+├── questions_candidates
+└── sources
+```
+
+Esta estructura ya está contemplada en el contrato como componente interno de Data/IA.
+
+---
+
+# 11. Etapa 6 — Query Builder
+
+## Objetivo
+
+Construir la consulta que utilizará el sistema para buscar el contexto relevante.
+
+Este componente es necesario porque el usuario no necesariamente proporciona una pregunta explícita.
+
+El usuario proporciona principalmente:
+
+```text
+Documento
++
+Perfil
++
+Formato
+```
+
+Por ejemplo:
+
+```text
+Documento: Introducción a Redes en OCI
+Perfil: JUNIOR
+Formato: FLASHCARD
+```
+
+El sistema debe transformar estos parámetros en una intención de búsqueda.
+
+---
+
+## Propuesta MVP
+
+Inicialmente se propone:
+
+> **Query Builder genérico**
+
+y no cuatro query builders independientes.
+
+Flujo:
+
+```text
+Perfil
+   +
+Formato
+   +
+Documento / Knowledge Core
+   │
+   ▼
+Query Builder
+   │
+   ▼
+Consulta inicial
+   │
+   ▼
+Retrieval
+```
+
+Posteriormente, si las pruebas demuestran que un formato necesita información diferente, podrá incorporarse especialización.
+
+---
+
+# 12. Estrategia de especialización
+
+No descartamos consultas especializadas.
+
+Pero proponemos una estrategia progresiva:
+
+```mermaid
+flowchart TD
+
+    A[Perfil + Formato + Documento]
+    --> B[Query genérica]
+
+    B --> C[Retrieval inicial]
+
+    C --> D{¿Contexto suficiente?}
+
+    D -->|Sí| E[Continuar]
+    
+    D -->|No| F[Consulta especializada]
+
+    F --> G[Segundo Retrieval]
+
+    G --> E
+
+    E --> H[Generación]
+```
+
+Esto permite comenzar con una solución simple y agregar especialización únicamente cuando exista evidencia de que mejora el resultado.
+
+---
+
+# 13. Etapa 7 — Retrieval
+
+## Objetivo
+
+Encontrar los fragmentos más relevantes para la generación.
+
+La propuesta conceptual es:
+
+```text
+Query
+  │
+  ▼
+Búsqueda semántica
+  +
+Filtros de metadata
+  +
+Contexto estructural
+  │
+  ▼
+Chunks relevantes
+```
+
+La implementación puede utilizar un vector store como:
+
+* Chroma;
+* FAISS;
+* otra alternativa compatible.
+
+Para el MVP no se considera necesario incorporar una infraestructura de búsqueda excesivamente compleja.
+
+---
+
+# 14. Etapa 8 — Context Builder
+
+## Objetivo
+
+Construir el contexto final que será entregado al modelo generativo.
+
+No todo lo recuperado necesariamente debe enviarse al LLM.
+
+El Context Builder debe:
+
+1. recibir resultados del retrieval;
+2. eliminar información irrelevante;
+3. organizar el contexto;
+4. conservar referencias a las fuentes;
+5. incluir contexto estructural cuando sea necesario;
+6. preparar la información para generación.
+
+Conceptualmente:
+
+```text
+Retrieval
+   │
+   ├── Chunk 1
+   ├── Chunk 2
+   ├── Chunk 3
+   └── Chunk 4
+        │
+        ▼
+ Context Builder
+        │
+        ▼
+Contexto final
+        │
+        ▼
+       LLM
+```
+
+---
+
+# 15. Etapa 9 — Generación
+
+## Objetivo
+
+Generar el contenido solicitado utilizando:
+
+* contexto recuperado;
+* perfil;
+* formato;
+* reglas de generación;
+* Knowledge Core cuando corresponda.
+
+La generación debe adaptarse al perfil.
+
+Actualmente el contrato define:
+
+```text
+JUNIOR
+SENIOR
+EJECUTIVO
+```
+
+Y los formatos MVP definidos en el contrato son:
+
+```text
+FLASHCARD
+QUIZ
+EXECUTIVE_SUMMARY
+MIND_MAP
+```
+
+`STEP_BY_STEP` queda fuera del MVP según el contrato actual.
+
+---
+
+# 16. Relación Perfil + Formato
+
+La generación puede visualizarse como una matriz:
+
+|           | FLASHCARD | QUIZ | EXECUTIVE SUMMARY | MIND MAP |
+| --------- | --------: | ---: | ----------------: | -------: |
+| JUNIOR    |         ✓ |    ✓ |                 ✓ |        ✓ |
+| SENIOR    |         ✓ |    ✓ |                 ✓ |        ✓ |
+| EJECUTIVO |         ✓ |    ✓ |                 ✓ |        ✓ |
+
+El mismo conocimiento puede ser presentado de forma diferente dependiendo de:
+
+```text
+CONOCIMIENTO
+     │
+     ├── Perfil
+     │
+     └── Formato
+          │
+          ▼
+      Generación
+```
+
+---
+
+# 17. Etapa 10 — Validación
+
+La validación es una etapa obligatoria.
+
+No debe asumirse que una respuesta generada por el LLM es válida simplemente porque tiene un JSON correcto.
+
+Se propone validar al menos:
+
+```text
+┌───────────────────────────────┐
+│          VALIDACIÓN            │
+├───────────────────────────────┤
+│ ✓ Estructura                  │
+│ ✓ Perfil                      │
+│ ✓ Formato                     │
+│ ✓ Contexto suficiente         │
+│ ✓ Coherencia                  │
+│ ✓ Trazabilidad de fuentes     │
+└───────────────────────────────┘
+```
+
+Estos puntos son consistentes con la validación mínima propuesta en el contrato.
+
+---
+
+# 18. Grounding y fuentes
+
+El contenido generado debe poder relacionarse con las fuentes utilizadas.
+
+El contrato ya contempla:
+
+```json
+{
+  "source_id": "src_001",
+  "document_id": "doc_456",
+  "reference": "Sección 2.1"
+}
+```
+
+Para el MVP proponemos mantener esta trazabilidad.
+
+### Sobre `anclaje_fuente_score`
+
+Se considera una posible métrica útil, pero todavía debe definirse:
+
+* cómo se calcula;
+* qué evidencia utiliza;
+* cuál es su interpretación;
+* cuál sería un umbral válido;
+* quién es responsable de calcularlo.
+
+Por lo tanto:
+
+> **No se fija todavía una fórmula ni un threshold.**
+
+La propuesta previa identifica precisamente este punto como una decisión pendiente.
+
+---
+
+# 19. Resultado del pipeline
+
+El resultado final de Data/IA debe respetar el contrato con Backend.
+
+Estructura conceptual:
+
+```json
+{
+  "contract_version": "1.1",
+  "request_id": "req_123",
+  "document_id": "doc_456",
+  "profile": "JUNIOR",
+  "format": "FLASHCARD",
+  "status": "APPROVED",
+  "content": {},
+  "sources": [],
+  "validation": {}
+}
+```
+
+Data/IA no necesita devolver detalles internos como:
+
+```text
+chunks
+embeddings
+top_k
+similarity
+prompts
+LLM
+vector store
+```
+
+---
+
+# 20. Flujo completo
+
+```mermaid
+flowchart TD
+
+    A[Backend] --> B[Documento + Perfil + Formato]
+
+    B --> C[INGESTA]
+    C --> D[CHUNKING]
+    D --> E[ENRIQUECIMIENTO]
+
+    E --> F[EMBEDDINGS]
+    E --> G[KNOWLEDGE CORE]
+
+    F --> H[QUERY BUILDER]
+    G --> H
+
+    H --> I[RETRIEVAL]
+
+    I --> J[CONTEXT BUILDER]
+
+    J --> K[GENERACIÓN]
+
+    K --> L[VALIDACIÓN]
+
+    L --> M{¿Cumple?}
+
+    M -->|Sí| N[APPROVED]
+    M -->|No| O[REQUIRES_ADJUSTMENT / REJECTED]
+
+    N --> P[JSON]
+    O --> P
+
+    P --> A
+```
+
+---
+
+# 21. Responsabilidades Data/IA
+
+| Componente                         | Responsable          |
+| ---------------------------------- | -------------------- |
+| Ingesta / procesamiento documental | Data/IA*             |
+| Chunking                           | Data/IA              |
+| Metadata                           | Data/IA              |
+| Embeddings                         | Data/IA              |
+| Vector Store                       | Data/IA              |
+| Knowledge Core                     | Data/IA              |
+| Query Builder                      | Data/IA              |
+| Retrieval                          | Data/IA              |
+| Context Builder                    | Data/IA              |
+| Generación                         | Data/IA              |
+| Adaptación por perfil              | Data/IA              |
+| Adaptación por formato             | Data/IA              |
+| Validación IA                      | Data/IA              |
+| Trazabilidad de fuentes            | Data/IA              |
+| Contrato JSON                      | Coordinado Data + BE |
+
+* La responsabilidad exacta de extracción/normalización todavía debe cerrarse con Backend.
+
+---
+
+# 22. Relación con Backend
+
+La separación propuesta es:
+
+```mermaid
+flowchart LR
+
+    FE[Frontend]
+    BE[Backend]
+    DS[Data / IA]
+
+    FE --> BE
+    BE --> DS
+    DS --> BE
+    BE --> FE
+```
+
+Backend conoce:
+
+```text
+Request
+Response
+Profiles
+Formats
+Status
+Errors
+```
+
+Data/IA conoce internamente:
+
+```text
+Chunking
+Embeddings
+Retrieval
+Knowledge Core
+Query Builder
+RAG
+LLM
+Validation
+```
+
+Esta separación permite que ambos equipos trabajen en paralelo.
+
+---
+
+# 23. Relación con los Issues de Data/IA
+
+La pipeline puede mapearse inicialmente con los Issues existentes:
+
+| Pipeline                | Issue |
+| ----------------------- | ----- |
+| Diseño de pipeline      | IA-01 |
+| Ingesta                 | IA-02 |
+| Chunking                | IA-03 |
+| Embeddings              | IA-04 |
+| Retrieval / RAG         | IA-05 |
+| Generación + adaptación | IA-06 |
+| Validación              | IA-07 |
+| Integración + JSON      | IA-08 |
+
+Este mapeo debe revisarse después de cerrar la pipeline definitiva.
+
+---
+
+# 24. Qué NO forma parte del MVP inicial
+
+Para evitar crecimiento innecesario del alcance, inicialmente dejamos fuera:
+
+### GraphRAG
+
+No se incorpora como requisito del MVP.
+
+Puede evaluarse posteriormente si las preguntas globales o relaciones entre conceptos demuestran que el retrieval vectorial no es suficiente.
+
+---
+
+### Knowledge Graph avanzado
+
+No se considera necesario para la primera versión.
+
+El Knowledge Core interno puede evolucionar posteriormente hacia una representación más estructurada.
+
+---
+
+### Query Builders independientes por formato
+
+No se implementan inicialmente cuatro sistemas completamente separados.
+
+Se comienza con una estrategia genérica y se especializa si las pruebas lo justifican.
+
+---
+
+### NLI avanzado
+
+No se considera requisito inicial.
+
+---
+
+### LLM-as-a-Judge avanzado
+
+Puede evaluarse como mecanismo de validación futura.
+
+---
+
+### Streaming
+
+No forma parte del contrato síncrono principal actual.
+
+---
+
+# 25. Decisiones que todavía NO debemos cerrar
+
+Esta pipeline define **qué necesitamos**, pero no pretende fijar todavía todos los detalles de implementación.
+
+Quedan pendientes, entre otros:
+
+| Decisión                                    | Estado                     |
+| ------------------------------------------- | -------------------------- |
+| Responsable de extracción/normalización     | 🔴 Pendiente               |
+| Modelo de embeddings                        | 🔴 Pendiente               |
+| Vector Store definitivo                     | 🟡 Por validar             |
+| Tamaño exacto del chunk                     | 🟡 Por probar              |
+| Overlap                                     | 🟡 Por probar              |
+| `top_k`                                     | 🟡 Por probar              |
+| Similarity threshold                        | 🟡 Por probar              |
+| Estrategia de reranking                     | 🟡 Por evaluar             |
+| Query especializada por formato             | 🟡 Por validar con pruebas |
+| Fórmula de grounding                        | 🔴 Pendiente               |
+| Threshold de grounding                      | 🔴 Pendiente               |
+| Reglas exactas de insuficiencia de contexto | 🔴 Pendiente               |
+| Timeout                                     | 🔴 Pendiente con BE        |
+| Límites de documentos                       | 🔴 Pendiente               |
+| Persistencia final                          | 🔴 Pendiente               |
+
+---
+
+# 26. Regla para tomar decisiones técnicas
+
+Antes de agregar un componente al MVP, debemos responder:
+
+### 1. ¿Qué problema concreto resuelve?
+
+### 2. ¿Es necesario para el flujo principal?
+
+### 3. ¿Podemos demostrar que mejora el resultado?
+
+### 4. ¿Cuánto tiempo agrega?
+
+### 5. ¿Cuánto código agrega?
+
+### 6. ¿Cuánto aumenta el costo?
+
+### 7. ¿Aumenta la dificultad de mantenimiento?
+
+### 8. ¿Afecta el contrato con Backend?
+
+### 9. ¿Existe una alternativa más simple?
+
+Si una propuesta no demuestra un beneficio suficiente para el MVP, puede quedar como evolución futura.
+
+---
+
+# 27. Criterio de evolución
+
+La arquitectura no debe impedir mejoras posteriores.
+
+La evolución esperada puede ser:
+
+```text
+                 MVP
+                  │
+                  ▼
+        ┌───────────────────┐
+        │ Pipeline base     │
+        │ RAG + generación  │
+        └─────────┬─────────┘
+                  │
+          Evaluación real
+                  │
+       ┌──────────┼──────────┐
+       ▼          ▼          ▼
+   Retrieval   Metadata   Grounding
+   avanzado    avanzado    avanzado
+       │          │          │
+       └──────────┼──────────┘
+                  ▼
+          Arquitectura v2
+                  │
+                  ▼
+        GraphRAG / Knowledge
+        Graph / agentes etc.
+```
+
+La evolución debe estar basada en evidencia obtenida durante pruebas y no únicamente en incorporar tecnologías por disponibilidad.
+
+---
+
+# 28. Línea base propuesta
+
+La propuesta completa puede resumirse así:
+
+```text
+                    NUEVAMENTE
+                         │
+                         ▼
+                    DOCUMENTO
+                         │
+                         ▼
+                      INGESTA
+                         │
+                         ▼
+                     CHUNKING
+                         │
+                         ▼
+                   ENRIQUECIMIENTO
+                         │
+                 ┌───────┴───────┐
+                 ▼               ▼
+             EMBEDDINGS     KNOWLEDGE CORE
+                 │               │
+                 └───────┬───────┘
+                         ▼
+                   QUERY BUILDER
+                         │
+                         ▼
+                      RETRIEVAL
+                         │
+                         ▼
+                  CONTEXT BUILDER
+                         │
+                         ▼
+                     GENERACIÓN
+                         │
+                  Perfil + Formato
+                         │
+                         ▼
+                     VALIDACIÓN
+                         │
+              ┌──────────┴──────────┐
+              ▼                     ▼
+          APPROVED              REJECTED
+              │
+              ▼
+          JSON / SOURCES
+              │
+              ▼
+           BACKEND
+```
+
+---
+
+# 29. Estado del documento
+
+**Estado actual:** 🟡 Propuesta base
+
+Este documento **no representa todavía una decisión final del equipo**.
+
+El siguiente paso es validar esta pipeline contra:
+
+1. requisitos funcionales del proyecto;
+2. alcance del MVP;
+3. contrato BE ↔ Data/IA;
+4. Issues actuales de Data/IA;
+5. pruebas técnicas disponibles.
+
+Después de establecer esta línea base podremos analizar las propuestas de los integrantes del equipo y clasificarlas como:
+
+```text
+ADOPTAR
+   │
+   ├── Mejora necesaria para MVP
+   │
+   └── Compatible con arquitectura actual
+
+ADAPTAR
+   │
+   └── La idea es válida pero requiere simplificación
+
+FUTURO
+   │
+   └── Tiene valor pero excede el MVP
+
+NO INCORPORAR
+   │
+   └── No resuelve una necesidad demostrada
+```
+
+---
+
+# 30. Próximo paso
+
+Una vez aprobada esta línea base por Data/IA, el proceso recomendado será:
+
+```text
+01. PIPELINE BASE
+        │
+        ▼
+02. VALIDAR REQUISITOS
+        │
+        ▼
+03. VALIDAR CONTRATO BE ↔ DATA
+        │
+        ▼
+04. IDENTIFICAR GAPS
+        │
+        ▼
+05. REVISAR PROPUESTAS DEL EQUIPO
+        │
+        ▼
+06. ADOPTAR / ADAPTAR / FUTURO
+        │
+        ▼
+07. TOMAR DECISIONES
+        │
+        ▼
+08. ACTUALIZAR PIPELINE
+        │
+        ▼
+09. ACTUALIZAR ISSUES
+        │
+        ▼
+10. ACTUALIZAR CONTRATO / ADR
+```
+
+**Principio rector:**
+
+> **Primero definimos qué necesita NuevaMente. Después decidimos cómo implementarlo.**
