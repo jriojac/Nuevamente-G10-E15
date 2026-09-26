@@ -157,7 +157,7 @@ Backend enviará a Data/IA una solicitud con esta estructura:
 
 ---
 
-# 7. Documento de entrada
+# 🔴 7. Documento de entrada
 
 El contrato trabaja con **texto normalizado**, no con un formato de archivo específico.
 
@@ -232,7 +232,7 @@ Backend no necesita conocer prompts ni reglas internas.
 
 ---
 
-#     🔴 9. Formatos
+#  9. Formatos
 
 ## 9.1 `FLASHCARD`
 
@@ -330,7 +330,7 @@ Ejemplo:
 
 ---
 
-# 10. Estructura común de `content`
+# 🔴 10. Estructura común de `content`
 
 Todos los formatos utilizan:
 
@@ -357,7 +357,7 @@ Para que Backend pueda avanzar sin depender de la implementación de DS:
 
 ---
 
-# 🔴 11. Contrato DS → BE
+# 11. Contrato DS → BE
 
 La respuesta tiene una estructura común para los 4 formatos:
 
@@ -393,7 +393,7 @@ La respuesta tiene una estructura común para los 4 formatos:
 
 ---
 
-# 13. Estados
+# 🔴 13. Estados
 
 Se utilizarán tres estados funcionales:
 
@@ -432,7 +432,7 @@ Ejemplo de resultado rechazado:
 
 ---
 
-# 🔴 14. Fuentes y trazabilidad
+# 14. Fuentes y trazabilidad
 
 Data/IA debe informar las fuentes utilizadas para construir el contenido.
 
@@ -492,7 +492,7 @@ vector_store_id
 
 ---
 
-# 🔴 15. Validación
+# 🟡 15. Validación
 
 Data/IA valida el resultado antes de devolverlo.
 
@@ -538,7 +538,7 @@ no forma parte todavía de una regla aprobada.
 
 ---
 
-# 🔴 16. Contexto insuficiente
+# 16. Contexto insuficiente
 
 Data/IA no debe inventar información cuando el contexto disponible no sea suficiente.
 
@@ -566,7 +566,7 @@ Cuando el contexto sea insuficiente:
 
 ---
 
-# 17. Errores técnicos
+# 🔴 17. Errores técnicos
 
 Los errores técnicos se diferencian de los estados funcionales de generación.
 
@@ -628,7 +628,7 @@ Responsable de:
 
 ---
 
-# 19. Timeout y retries
+# 🔴 🟡  19. Timeout y retries
 
 Se separan dos niveles.
 
@@ -665,7 +665,7 @@ DS retries: ______
 
 ---
 
-# 🔴 20. Idempotencia
+# 🟡  20. Idempotencia
 
 `request_id` identifica una solicitud:
 
@@ -696,7 +696,7 @@ La versión interna del pipeline de Data/IA es independiente y no debe ser una d
 
 ---
 
-# 22. Límites del MVP
+# 🔴 22. Límites del MVP
 
 Deben definirse como mínimo:
 
@@ -996,20 +996,20 @@ Esto permite que Backend desarrolle y pruebe sin esperar al modelo real.
 
 ## 31. Decisiones pendientes — enfocadas en desbloquear Backend
 
-| # | Decisión | Prioridad para BE | Dónde está definido en el contrato | ¿Bloquea BE? |
+| # | Decisión pendiente concreta | Prioridad para BE | Dónde está definido | ¿Bloquea BE? |
 |---|---|---|---|---|
-| 1 | Quién extrae y normaliza el documento | 🔴 Ahora | 11 — Endpoint principal / documento de entrada | **Sí** |
-| 2 | JSON Schema definitivo de los 4 formatos | 🔴 Ahora | 9 — Contrato de contenido / formatos | **Sí** |
-| 3 | Campos mínimos de `validation` | 🟡 Inicial | 12 — Respuesta BE → FE | No |
-| 4 | Información definitiva de `sources` para FE | 🟢 Después | 12–13 — Respuesta / consumo FE | No |
-| 5 | Estados `APPROVED / REQUIRES_ADJUSTMENT / REJECTED` | 🔴 Ahora | 14 — Ciclo de vida / estados | **Sí** |
-| 6 | Catálogo definitivo de errores | 🔴 Ahora | 15 — Errores | **Sí** |
-| 7 | Timeout | 🔴 Ahora, valor inicial | 16 — Timeout y reintentos | **Sí** |
-| 8 | Retries | 🟡 Inicial | 16 — Timeout y reintentos | No |
-| 9 | Idempotencia | 🟡 Después | 17 — Idempotencia | No |
-| 10 | Límites de entrada/salida | 🔴 Ahora, valores iniciales | 20 — Seguridad y límites | **Sí** |
-| 11 | Qué persiste BE en OCI | 🟢 Después | 18 — Persistencia OCI | No |
-| 12 | Streaming dentro o fuera del MVP | 🟢 Después / fuera del MVP inicial | 19 — Progreso / Streaming | No |
+| 1 | **¿Quién recibe el archivo, extrae el contenido, normaliza el texto y construye `document.text`?** | 🔴 Ahora | 7 — Documento de entrada | **Sí** |
+| 2 | **¿Se aprueban los JSON Schemas definitivos de `FLASHCARD`, `QUIZ`, `EXECUTIVE_SUMMARY` y `MIND_MAP`?** | 🔴 Ahora | 10 — Estructura común de `content` + §9 — Formatos | **Sí** |
+| 3 | **¿Cuáles son los campos mínimos obligatorios de `validation`?** | 🟡 Inicial | §15 — Validación | No |
+| 4 | **¿La estructura actual de `sources` es suficiente para que FE muestre la trazabilidad?** | 🟢 Después | 14 — Fuentes y trazabilidad | No |
+| 5 | **¿Los tres estados `APPROVED`, `REQUIRES_ADJUSTMENT` y `REJECTED` son suficientes para el MVP?** | 🔴 Ahora | 13 — Estados | **Sí** |
+| 6 | **¿BE + DS aprueban el catálogo de errores propuesto o deben modificarse códigos/descripciones?** | 🔴 Ahora | 17 — Errores técnicos | **Sí** |
+| 7 | **¿Cuál será el timeout máximo de la comunicación BE → DS?** | 🔴 Ahora | 19 — Timeout y retries | **Sí** |
+| 8 | **¿Cuántos retries hará BE ante un fallo de integración y cuáles errores serán reintentables?** | 🟡 Inicial | 19 — Timeout y retries | No |
+| 9 | **¿`request_id` será también la clave de idempotencia o se utilizará un `idempotency_key` separado?** | 🟡 Después | 20 — Idempotencia | No |
+| 10 | **¿Cuáles serán los límites máximos de entrada, procesamiento y salida?** | 🔴 Ahora, valores iniciales | §22 — Límites del MVP | **Sí** |
+| 11 | **¿Qué debe persistir Backend en OCI: documento original, resultado generado o ambos?** | 🟢 Después | §24 — OCI | No |
+| 12 | **¿Streaming forma parte del MVP o queda para una versión posterior?** | 🟢 Después | §25 — Streaming / progreso | No |
 
 ### Ya definido y NO sujeto a discusión
 
