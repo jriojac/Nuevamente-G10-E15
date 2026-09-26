@@ -8,7 +8,7 @@
 
 ---
 
-# 🔴 1. Objetivo del contrato 
+# 1. Objetivo del contrato 
 
 Este documento define de forma clara:
 
@@ -26,7 +26,7 @@ Backend no necesita conocer la implementación interna de Data/IA y Data/IA no n
 
 ---
 
-# 🔴 2. Alcance del MVP — YA DEFINIDO
+# 2. Alcance del MVP — YA DEFINIDO
 
 ## 2.1 Perfiles
 
@@ -123,7 +123,7 @@ DS → BE
 
 ---
 
-# 🔴 5. Contrato BE → DS
+#  5. Contrato BE → DS
 
 Backend enviará a Data/IA una solicitud con esta estructura:
 
@@ -143,7 +143,7 @@ Backend enviará a Data/IA una solicitud con esta estructura:
 
 ---
 
-# 🔴 6. Campos del Request
+#  6. Campos del Request
 
 | Campo | Tipo | Obligatorio | Descripción |
 |---|---|---:|---|
@@ -157,7 +157,7 @@ Backend enviará a Data/IA una solicitud con esta estructura:
 
 ---
 
-# 🔴 7. Documento de entrada
+# 7. Documento de entrada
 
 El contrato trabaja con **texto normalizado**, no con un formato de archivo específico.
 
@@ -232,7 +232,7 @@ Backend no necesita conocer prompts ni reglas internas.
 
 ---
 
-# 9. Formatos
+#     🔴 9. Formatos
 
 ## 9.1 `FLASHCARD`
 
@@ -330,7 +330,7 @@ Ejemplo:
 
 ---
 
-# 🔴 10. Estructura común de `content`
+# 10. Estructura común de `content`
 
 Todos los formatos utilizan:
 
@@ -357,7 +357,7 @@ Para que Backend pueda avanzar sin depender de la implementación de DS:
 
 ---
 
-# 11. Contrato DS → BE
+# 🔴 11. Contrato DS → BE
 
 La respuesta tiene una estructura común para los 4 formatos:
 
@@ -432,7 +432,7 @@ Ejemplo de resultado rechazado:
 
 ---
 
-# 14. Fuentes y trazabilidad
+# 🔴 14. Fuentes y trazabilidad
 
 Data/IA debe informar las fuentes utilizadas para construir el contenido.
 
@@ -492,7 +492,7 @@ vector_store_id
 
 ---
 
-# 15. Validación
+# 🔴 15. Validación
 
 Data/IA valida el resultado antes de devolverlo.
 
@@ -538,7 +538,7 @@ no forma parte todavía de una regla aprobada.
 
 ---
 
-# 16. Contexto insuficiente
+# 🔴 16. Contexto insuficiente
 
 Data/IA no debe inventar información cuando el contexto disponible no sea suficiente.
 
@@ -665,7 +665,7 @@ DS retries: ______
 
 ---
 
-# 20. Idempotencia
+# 🔴 20. Idempotencia
 
 `request_id` identifica una solicitud:
 
