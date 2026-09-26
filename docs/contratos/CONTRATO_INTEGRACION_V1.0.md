@@ -8,7 +8,7 @@
 
 ---
 
-# 1. Objetivo del contrato 
+# 1. Objetivo del contrato
 
 Este documento define de forma clara:
 
@@ -123,13 +123,13 @@ DS → BE
 
 ---
 
-#  5. Contrato BE → DS
+# 5. Contrato BE → DS
 
 Backend enviará a Data/IA una solicitud con esta estructura:
 
 ```json
 {
-  "contract_version": "1.0",
+  "contract_version": "1.1",
   "request_id": "req_123",
   "document": {
     "document_id": "doc_456",
@@ -143,7 +143,7 @@ Backend enviará a Data/IA una solicitud con esta estructura:
 
 ---
 
-#  6. Campos del Request
+# 6. Campos del Request
 
 | Campo | Tipo | Obligatorio | Descripción |
 |---|---|---:|---|
@@ -232,7 +232,7 @@ Backend no necesita conocer prompts ni reglas internas.
 
 ---
 
-#  9. Formatos
+# 9. Formatos
 
 ## 9.1 `FLASHCARD`
 
@@ -353,7 +353,7 @@ Para que Backend pueda avanzar sin depender de la implementación de DS:
 - [ ] Sí → DS entrega/define los 4 schemas.
 - [ ] No → definir una estructura mínima temporal y fecha para cerrar los schemas.
 
-> **Recomendación:** cerrar los 4 schemas como parte de V1.0. Así BE puede desarrollar DTOs, validaciones y mocks sin esperar al pipeline de IA.
+> **Recomendación:** cerrar los 4 schemas como parte de V1.1. Así BE puede desarrollar DTOs, validaciones y mocks sin esperar al pipeline de IA.
 
 ---
 
@@ -363,7 +363,7 @@ La respuesta tiene una estructura común para los 4 formatos:
 
 ```json
 {
-  "contract_version": "1.0",
+  "contract_version": "1.1",
   "request_id": "req_123",
   "document_id": "doc_456",
   "profile": "JUNIOR",
@@ -390,6 +390,18 @@ La respuesta tiene una estructura común para los 4 formatos:
 | `content` | object | Cuando existe resultado | Contenido generado |
 | `sources` | array | Sí | Fuentes utilizadas |
 | `validation` | object | Sí | Resultado de validación |
+
+### Estados funcionales
+
+Los estados funcionales definidos en el contrato son:
+
+```text
+APPROVED
+REQUIRES_ADJUSTMENT
+REJECTED
+```
+
+Los errores técnicos utilizan un esquema de error específico y no representan un cuarto estado funcional de generación.
 
 ---
 
@@ -427,12 +439,13 @@ Ejemplo de resultado rechazado:
 
 **Confirmar que estos tres estados son suficientes para el MVP.**
 
-- [ ] Aprobado
-- [ ] Requiere cambio
+- [ ] `APPROVED`
+- [ ] `REQUIRES_ADJUSTMENT`
+- [ ] `REJECTED`
 
 ---
 
-# 14. Fuentes y trazabilidad
+# 🟢 14. Fuentes y trazabilidad
 
 Data/IA debe informar las fuentes utilizadas para construir el contenido.
 
@@ -538,7 +551,7 @@ no forma parte todavía de una regla aprobada.
 
 ---
 
-# 16. Contexto insuficiente
+# 🔴 16. Contexto insuficiente
 
 Data/IA no debe inventar información cuando el contexto disponible no sea suficiente.
 
@@ -559,10 +572,12 @@ Ejemplo:
 
 ## Decisión pendiente
 
-Cuando el contexto sea insuficiente:
+Definir el comportamiento funcional cuando el contexto sea insuficiente:
 
 - [ ] `REJECTED`
 - [ ] `REQUIRES_ADJUSTMENT`
+
+> Esta decisión debe ser consistente con los estados definidos en §13 y con el catálogo de errores de §17.
 
 ---
 
@@ -574,7 +589,7 @@ Ejemplo:
 
 ```json
 {
-  "contract_version": "1.0",
+  "contract_version": "1.1",
   "request_id": "req_123",
   "status": "ERROR",
   "error": {
@@ -583,6 +598,8 @@ Ejemplo:
   }
 }
 ```
+
+`ERROR` corresponde al sobre de respuesta de error técnico y no a un estado funcional de generación.
 
 ## Catálogo inicial propuesto
 
@@ -628,7 +645,7 @@ Responsable de:
 
 ---
 
-# 🔴 🟡  19. Timeout y retries
+# 🔴 19. Timeout y retries
 
 Se separan dos niveles.
 
@@ -653,6 +670,11 @@ Puede corresponder a:
 - proveedor LLM;
 - recuperación ante fallos internos.
 
+## Prioridad de las decisiones
+
+- 🔴 **Timeout BE → DS:** debe definirse para iniciar la integración.
+- 🟡 **Retries:** deben definirse durante la implementación inicial y no bloquean el inicio de Backend.
+
 ## Decisión pendiente
 
 Definir:
@@ -665,7 +687,7 @@ DS retries: ______
 
 ---
 
-# 🟡  20. Idempotencia
+# 🟡 20. Idempotencia
 
 `request_id` identifica una solicitud:
 
@@ -680,6 +702,8 @@ Definir si `request_id` será también la clave de idempotencia.
 - [ ] Sí
 - [ ] No → utilizar `idempotency_key`
 
+Esta decisión no bloquea el inicio de Backend, pero debe cerrarse durante la implementación inicial.
+
 ---
 
 # 21. Versionado
@@ -687,7 +711,7 @@ Definir si `request_id` será también la clave de idempotencia.
 La versión del contrato se identifica mediante:
 
 ```json
-"contract_version": "1.0"
+"contract_version": "1.1"
 ```
 
 Un cambio incompatible en Request o Response requiere una nueva versión del contrato.
@@ -755,7 +779,7 @@ Responsable de:
 
 ---
 
-# 24. OCI
+# 🟢 24. OCI
 
 La persistencia de resultados en OCI corresponde a Backend.
 
@@ -775,7 +799,7 @@ Data/IA no necesita escribir directamente en OCI para cumplir este contrato.
 
 ## Decisión pendiente
 
-Definir qué debe persistir Backend:
+**¿Qué debe persistir Backend en OCI?**
 
 - [ ] Documento original
 - [ ] Resultado generado
@@ -784,7 +808,7 @@ Definir qué debe persistir Backend:
 
 ---
 
-# 25. Streaming / progreso
+# 🟢 25. Streaming / progreso
 
 Se había propuesto progreso mediante SSE/WebSocket.
 
@@ -894,6 +918,8 @@ Estos parámetros pueden cambiar internamente mientras el contrato se mantenga.
 | LLM | | ✓ |
 | Vector Store | | ✓ |
 
+La responsabilidad sobre extracción y normalización queda pendiente de la decisión indicada en §7.
+
 ---
 
 # 29. Lo que Backend puede comenzar a construir inmediatamente
@@ -959,7 +985,7 @@ Mientras Data/IA desarrolla el pipeline, Backend puede utilizar:
 
 ```json
 {
-  "contract_version": "1.0",
+  "contract_version": "1.1",
   "request_id": "req_mock_001",
   "document_id": "doc_001",
   "profile": "JUNIOR",
@@ -994,22 +1020,23 @@ Esto permite que Backend desarrolle y pruebe sin esperar al modelo real.
 
 ---
 
-## 31. Decisiones pendientes — enfocadas en desbloquear Backend
+# 31. Decisiones pendientes — enfocadas en desbloquear Backend
 
 | # | Decisión pendiente concreta | Prioridad para BE | Dónde está definido | ¿Bloquea BE? |
 |---|---|---|---|---|
 | 1 | **¿Quién recibe el archivo, extrae el contenido, normaliza el texto y construye `document.text`?** | 🔴 Ahora | 7 — Documento de entrada | **Sí** |
 | 2 | **¿Se aprueban los JSON Schemas definitivos de `FLASHCARD`, `QUIZ`, `EXECUTIVE_SUMMARY` y `MIND_MAP`?** | 🔴 Ahora | 10 — Estructura común de `content` + 9 — Formatos | **Sí** |
-| 3 | **¿Cuáles son los campos mínimos obligatorios de `validation`?** | 🟡 Inicial | §15 — Validación | No |
+| 3 | **¿Cuáles son los campos mínimos obligatorios de `validation`?** | 🟡 Inicial | 15 — Validación | No |
 | 4 | **¿La estructura actual de `sources` es suficiente para que FE muestre la trazabilidad?** | 🟢 Después | 14 — Fuentes y trazabilidad | No |
 | 5 | **¿Los tres estados `APPROVED`, `REQUIRES_ADJUSTMENT` y `REJECTED` son suficientes para el MVP?** | 🔴 Ahora | 13 — Estados | **Sí** |
 | 6 | **¿BE + DS aprueban el catálogo de errores propuesto o deben modificarse códigos/descripciones?** | 🔴 Ahora | 17 — Errores técnicos | **Sí** |
-| 7 | **¿Cuál será el timeout máximo de la comunicación BE → DS?** | 🔴 Ahora | 19 — Timeout y retries | **Sí** |
-| 8 | **¿Cuántos retries hará BE ante un fallo de integración y cuáles errores serán reintentables?** | 🟡 Inicial | 19 — Timeout y retries | No |
-| 9 | **¿`request_id` será también la clave de idempotencia o se utilizará un `idempotency_key` separado?** | 🟡 Después | 20 — Idempotencia | No |
-| 10 | **¿Cuáles serán los límites máximos de entrada, procesamiento y salida?** | 🔴 Ahora, valores iniciales | 22 — Límites del MVP | **Sí** |
-| 11 | **¿Qué debe persistir Backend en OCI: documento original, resultado generado o ambos?** | 🟢 Después | 24 — OCI | No |
-| 12 | **¿Streaming forma parte del MVP o queda para una versión posterior?** | 🟢 Después | 25 — Streaming / progreso | No |
+| 7 | **¿Cuando el contexto sea insuficiente, el resultado debe quedar como `REJECTED` o `REQUIRES_ADJUSTMENT`?** | 🔴 Ahora | 16 — Contexto insuficiente | **Sí** |
+| 8 | **¿Cuál será el timeout máximo de la comunicación BE → DS?** | 🔴 Ahora | 19 — Timeout y retries | **Sí** |
+| 9 | **¿Cuántos retries hará BE ante un fallo de integración y cuáles errores serán reintentables?** | 🟡 Inicial | 19 — Timeout y retries | No |
+| 10 | **¿`request_id` será también la clave de idempotencia o se utilizará un `idempotency_key` separado?** | 🟡 Inicial | 20 — Idempotencia | No |
+| 11 | **¿Cuáles serán los límites máximos de entrada, procesamiento y salida?** | 🔴 Ahora, valores iniciales | 22 — Límites del MVP | **Sí** |
+| 12 | **¿Qué debe persistir Backend en OCI: documento original, resultado generado o ambos?** | 🟢 Después | 24 — OCI | No |
+| 13 | **¿Streaming forma parte del MVP o queda para una versión posterior?** | 🟢 Después | 25 — Streaming / progreso | No |
 
 ### Ya definido y NO sujeto a discusión
 
@@ -1050,6 +1077,7 @@ Estas decisiones son **bloqueantes** para Backend y deben estar definidas antes 
 - [ ] Schema de `EXECUTIVE_SUMMARY` aprobado.
 - [ ] Schema de `MIND_MAP` aprobado.
 - [ ] Estados `APPROVED`, `REQUIRES_ADJUSTMENT` y `REJECTED` aprobados.
+- [ ] Comportamiento ante contexto insuficiente definido.
 - [ ] Catálogo de errores aprobado.
 - [ ] Responsabilidad de extracción y normalización del documento definida.
 - [ ] Timeout máximo de la comunicación BE → DS definido.
@@ -1070,7 +1098,6 @@ Estas decisiones son necesarias para completar la implementación, pero **no blo
 - [ ] Campos mínimos de `validation` definidos.
 - [ ] Retries definidos.
 - [ ] Criterios para determinar qué errores son reintentables definidos.
-- [ ] Estructura de `sources` validada para el consumo de Frontend.
 - [ ] Idempotencia definida.
 
 Mientras estas decisiones permanezcan abiertas, los equipos pueden trabajar con una definición provisional compatible con el contrato.
@@ -1083,14 +1110,16 @@ Cualquier decisión provisional que posteriormente modifique el contrato deberá
 
 Estas decisiones no deben bloquear el desarrollo inicial del MVP:
 
-- [ ] Qué información debe persistir Backend en OCI.
-- [ ] Si se persiste el documento original, el resultado generado o ambos.
+- [ ] Estructura de `sources` validada para el consumo de Frontend.
+- [ ] Qué debe persistir Backend en OCI: documento original, resultado generado o ambos.
 - [ ] Streaming definido como parte del MVP o como evolución posterior.
 - [ ] Detalles adicionales relacionados con persistencia y progreso.
 
 Estas decisiones pueden cerrarse posteriormente, una vez validado el flujo principal:
 
-**DS/IA → Backend → Frontend**
+```text
+DS/IA → Backend → Frontend
+```
 
 ---
 
@@ -1116,18 +1145,19 @@ El contrato se considera **completamente cerrado** cuando todas las decisiones d
 - [ ] Response aprobado.
 - [ ] Schemas de los 4 formatos aprobados.
 - [ ] Estados aprobados.
+- [ ] Comportamiento ante contexto insuficiente definido.
 - [ ] Catálogo de errores aprobado.
 - [ ] Responsabilidad de extracción y normalización definida.
 - [ ] Timeout definido.
 - [ ] Límites definidos.
 - [ ] Validation definido.
-- [ ] Sources validado.
+- [ ] Sources validado para el consumo de Frontend.
 - [ ] Retries definidos.
 - [ ] Criterios de reintento definidos.
 - [ ] Idempotencia definida.
 - [ ] Persistencia OCI definida.
 - [ ] Streaming definido como MVP o evolución posterior.
-- [ ] `contract_version = 1.0` aprobado.
+- [ ] `contract_version = 1.1` aprobado.
 
 ### Regla final
 
@@ -1144,6 +1174,8 @@ Una vez aprobado este contrato:
 > **Backend puede avanzar utilizando el contrato y un Mock de Data/IA.**
 
 > **Data/IA puede desarrollar y cambiar internamente su pipeline sin bloquear a Backend.**
+
+> **Frontend puede avanzar utilizando el contrato y datos Mock mientras se completa la integración real.**
 
 > **Ningún equipo debe cambiar unilateralmente Request, Response, enums o schemas sin actualizar este contrato y comunicar el cambio al otro equipo.**
 
