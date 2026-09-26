@@ -999,7 +999,7 @@ Esto permite que Backend desarrolle y pruebe sin esperar al modelo real.
 | # | Decisión pendiente concreta | Prioridad para BE | Dónde está definido | ¿Bloquea BE? |
 |---|---|---|---|---|
 | 1 | **¿Quién recibe el archivo, extrae el contenido, normaliza el texto y construye `document.text`?** | 🔴 Ahora | 7 — Documento de entrada | **Sí** |
-| 2 | **¿Se aprueban los JSON Schemas definitivos de `FLASHCARD`, `QUIZ`, `EXECUTIVE_SUMMARY` y `MIND_MAP`?** | 🔴 Ahora | 10 — Estructura común de `content` + §9 — Formatos | **Sí** |
+| 2 | **¿Se aprueban los JSON Schemas definitivos de `FLASHCARD`, `QUIZ`, `EXECUTIVE_SUMMARY` y `MIND_MAP`?** | 🔴 Ahora | 10 — Estructura común de `content` + 9 — Formatos | **Sí** |
 | 3 | **¿Cuáles son los campos mínimos obligatorios de `validation`?** | 🟡 Inicial | §15 — Validación | No |
 | 4 | **¿La estructura actual de `sources` es suficiente para que FE muestre la trazabilidad?** | 🟢 Después | 14 — Fuentes y trazabilidad | No |
 | 5 | **¿Los tres estados `APPROVED`, `REQUIRES_ADJUSTMENT` y `REJECTED` son suficientes para el MVP?** | 🔴 Ahora | 13 — Estados | **Sí** |
